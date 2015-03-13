@@ -11,7 +11,7 @@
             "homepage": "http://amilabs.co"
         }
     ],
-    "repositories": [
+    "repositories": {
         "coinspark": {
             "type": "package",
             "package": {
@@ -24,7 +24,7 @@
                 }
             }
         }
-    ],
+    },
     "require": {
         "php": ">=5.3.1",
         "coinspark/php-op_return": ">=1.0.2",
