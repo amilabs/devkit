@@ -2,7 +2,7 @@
 
 namespace AmiLabs\DevKit;
 
-require PATH_LIB . '/coinspark/php-OP_RETURN.php';
+require PATH_LIB . '/artemko7v/php-op_return/php-OP_RETURN.php';
 
 /**
  * Transaction helper class.

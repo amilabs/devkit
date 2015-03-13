@@ -2,9 +2,7 @@
 
 namespace AmiLabs\DevKit;
 
-require_once PATH_LIB . '/json-rpc/Client.php';
-use JsonRPC\Client;
-
+use \JsonRPC\Client;
 use \AmiLabs\DevKit\Cache;
 use \AmiLabs\DevKit\Logger;
 

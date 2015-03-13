@@ -3,9 +3,7 @@
 namespace AmiLabs\DevKit;
 
 use \AmiLabs\DevKit\Registry;
-
-require_once PATH_LIB . '/json-rpc/Client.php';
-use JsonRPC\Client;
+use \JsonRPC\Client;
 
 /**
  * Request class.
