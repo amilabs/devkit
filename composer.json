@@ -12,14 +12,22 @@
         }
     ],
     "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/coinspark/php-OP_RETURN"
+        "coinspark": {
+            "type": "package",
+            "package": {
+                "name": "coinspark/php-op_return",
+                "version": "1.0.2",
+                "source": {
+                    "url": "https://github.com/coinspark/php-OP_RETURN",
+                    "type": "git",
+                    "reference": "origin/master"
+                }
+            }
         }
     ],
     "require": {
         "php": ">=5.3.1",
-        "coinspark/php-OP_RETURN": ">=1.0.2",
+        "coinspark/php-op_return": ">=1.0.2",
         "fguillot/json-rpc": "dev-master"
     },
     "autoload": {
