@@ -1,0 +1,17 @@
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/amilabs/devkit"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ArtemKo7v/php-OP_RETURN"
+        }
+    ],
+    "require": {
+        "amilabs/devkit": "dev-master",
+        "artemko7v/php-op_return": "dev-master",
+        "fguillot/json-rpc": "dev-master"
+    }
+}
