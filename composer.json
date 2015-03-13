@@ -16,18 +16,16 @@
             "type": "package",
             "package": {
                 "name": "coinspark/php-op_return",
-                "version": "1.0.2",
                 "source": {
                     "url": "https://github.com/coinspark/php-OP_RETURN",
-                    "type": "git",
-                    "reference": "origin/master"
+                    "type": "git"
                 }
             }
         }
     },
     "require": {
         "php": ">=5.3.1",
-        "coinspark/php-op_return": ">=1.0.2",
+        "coinspark/php-op_return": "dev-master",
         "fguillot/json-rpc": "dev-master"
     },
     "autoload": {
