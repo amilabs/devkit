@@ -1,0 +1,28 @@
+{
+    "name": "amilabs/devkit",
+    "type": "project",
+    "description": "",
+    "keywords": [],
+    "homepage": "http://amilabs.co",
+    "license": "Apache 2.0",
+    "authors": [
+        {
+            "name": "AmiLabs",
+            "homepage": "http://amilabs.co"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/coinspark/php-OP_RETURN"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.1",
+        "coinspark/php-OP_RETURN": "dev-master",
+        "fguillot/json-rpc": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {"AmiLabs\\DevKit": "src/"}
+    }
+}
