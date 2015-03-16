@@ -94,7 +94,19 @@ class Registry {
      * @return mixed
      */
     public function get($key = self::ROOT, $default = null){
-        return (self::ROOT === $key) ? $this->aData : ($this->exists($key) ? $this->aData[$key] : $default);
+        $aData = $this->aData;
+        if(strpos($key, '/') !== FALSE){
+            $aKeys = explode('/', $key);
+            foreach($aKeys as $subKey){
+                if(isset($aData[$subKey])){
+                    $aData = $aData[$subKey];
+                }else{
+                    return $default;
+                }
+            }
+            return $aData;
+        }
+        return (self::ROOT === $key) ? $aData : ($this->exists($key) ? $aData[$key] : $default);
     }
     /**
      * Stores a value in registry by specified name.
