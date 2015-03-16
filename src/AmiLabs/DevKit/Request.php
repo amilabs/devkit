@@ -27,6 +27,8 @@ class Request {
             }
             if(class_exists($className)){
                 self::$oDriver = new $className();
+            }else{
+                throw new \Exception("Request driver class " . $className . " not found");
             }
         }
         return self::$oDriver;
