@@ -30,7 +30,7 @@ class RPC {
             if(strpos($aDaemonConfig['driver'], '\\') !== FALSE){
                 $className = $aDaemonConfig['driver'];
             }else{
-                $className = 'RPC' . strtoupper($aDaemonConfig['driver']);
+                $className = '\\AmiLabs\\DevKit\\RPC' . strtoupper($aDaemonConfig['driver']);
             }
             if(class_exists($className)){
                 $this->aServices[$daemon] = new $className($aDaemonConfig);
