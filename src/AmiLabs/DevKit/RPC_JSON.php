@@ -3,8 +3,6 @@
 namespace AmiLabs\DevKit;
 
 use \JsonRPC\Client;
-use \AmiLabs\DevKit\Cache;
-use \AmiLabs\DevKit\Logger;
 
 /**
  * Class for JSON RPC execution.
