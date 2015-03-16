@@ -7,7 +7,7 @@ use \JsonRPC\Client;
 /**
  * Class for JSON RPC execution.
  */
-class RPC_JSON extends RPCServiceClient{
+class RPCJSON extends RPCServiceClient{
     /**
      * JSON RPC Client object
      *

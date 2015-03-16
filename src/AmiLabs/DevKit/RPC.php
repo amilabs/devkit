@@ -27,9 +27,15 @@ class RPC {
     public function __construct(){
         $this->aConfig = Registry::useStorage('CFG')->get('RPCServices');
         foreach($this->aConfig as $daemon => $aDaemonConfig){
-            switch($aDaemonConfig['driver']){
-                default:
-                    $this->aServices[$daemon] = new RPC_JSON($aDaemonConfig);
+            if(strpos($aDaemonConfig['driver'], '\\') !== FALSE){
+                $className = $aDaemonConfig['driver'];
+            }else{
+                $className = 'RPC' . strtoupper($aDaemonConfig['driver']);
+            }
+            if(class_exists($className)){
+                $this->aServices[$daemon] = new $className($aDaemonConfig);
+            }else{
+                throw new \Exception('RPC driver class ' . $className . ' not found');
             }
         }
     }
