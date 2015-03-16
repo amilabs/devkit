@@ -2,9 +2,6 @@
 
 namespace AmiLabs\DevKit;
 
-use \AmiLabs\DevKit\Registry;
-use \JsonRPC\Client;
-
 /**
  * Request class.
  */
@@ -23,14 +20,9 @@ class Request {
      */
     public static function getInstance($type = 'uri'){
         if(is_null(self::$oDriver)){
-            switch($type){
-                case 'json':
-                    self::$oDriver = new RequestJSON();
-                    break;
-                case 'cli':
-                case 'uri':
-                default:
-                    self::$oDriver = new RequestURI();
+            $className = 'Request' . strtoupper($type);
+            if(class_exists($className)){
+                self::$oDriver = new $className();
             }
         }
         return self::$oDriver;
@@ -153,105 +145,5 @@ abstract class RequestDriver {
      */
     public function getActionName(){
         return $this->actionName;
-    }
-}
-/**
- * Request with parameters ent through URI string driver.
- */
-class RequestURI extends RequestDriver implements IRequestDriver {
-    /**
-     * Constructor.
-     */
-    public function __construct(){
-        $path = explode('/', trim($_SERVER['SCRIPT_NAME'], '/'));
-        $parts  = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
-        $aParts = array();
-        $subfolder = '';
-        foreach ($path as $key => $val) {
-            if($val === $parts[$key]){
-                $subfolder .= ('/' . $val);
-                unset($parts[$key]);
-            } else {
-                break;
-            }
-        }
-        foreach($parts as $part){
-            $aParts[] = $part;
-        }
-        Registry::useStorage('ENV')->set('subfolder', $subfolder);
-        /*
-         * for /controller/action/ :
-         * 
-        if((count($aParts) > 1) && $aParts[1]){
-            $this->controllerName = $aParts[1];
-            if(isset($aParts[2]) && $aParts[2]){
-                $this->actionName = $aParts[2];
-            }
-        }
-        if(count($aParts) > 3){
-            for($i = 3; $i < count($aParts); $i++){
-                $this->aData[] = $aParts[$i];
-            }
-        }*/
-        if((count($aParts) > 0) && $aParts[0]){
-            $this->actionName = $aParts[0];
-            if(count($aParts) > 1){
-                for($i = 1; $i < count($aParts); $i++){
-                    $this->aData[] = urldecode($aParts[$i]);
-                }
-            }
-        }
-    }
-    /**
-     * Returns GET scope.
-     *
-     * @return array
-     */
-    public function getScopeGET(){
-        return $_GET;
-    }
-    /**
-     * Returns POST scope.
-     *
-     * @return array
-     */
-    public function getScopePOST(){
-        return $_POST;
-    }
-}
-
-/**
- * Request with parameters ent through URI string driver.
- */
-class RequestJSON extends RequestDriver implements IRequestDriver {
-
-    protected $method = 'GET';
-
-    /**
-     * Constructor.
-     * 
-     * @todo Check if method is POST
-     */
-    public function __construct(){
-        $this->method = $_SERVER['REQUEST_METHOD'];
-        $aData = @json_decode(file_get_contents('php://input'), true);
-        $this->aData = isset($aData['params']) ? $aData['params'] : array();
-        $this->actionName = isset($aData['method']) ? $aData['method'] : 'error';
-    }
-    /**
-     * Returns GET scope.
-     *
-     * @return array
-     */
-    public function getScopeGET(){
-        return array();
-    }
-    /**
-     * Returns POST scope.
-     *
-     * @return array
-     */
-    public function getScopePOST(){
-        return array();
     }
 }

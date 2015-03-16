@@ -3,6 +3,7 @@
 namespace AmiLabs\DevKit;
 
 use \AmiLabs\DevKit\Request;
+use \AmiLabs\DevKit\Registry;
 use \AmiLabs\DevKit\Template;
 
 /**
@@ -54,7 +55,7 @@ class Application{
      * @return \AmiLabs\DevKit\RequestURI
      */
     public function getRequest(){
-        return Request::getInstance('uri');
+        return Request::getInstance(Registry::useStorage('CFG')->get('request/type', 'uri'));
     }
     /**
      * Runs controller.
