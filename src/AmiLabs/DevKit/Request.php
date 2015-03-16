@@ -20,7 +20,11 @@ class Request {
      */
     public static function getInstance($type = 'uri'){
         if(is_null(self::$oDriver)){
-            $className = 'Request' . strtoupper($type);
+            if(strpos($type, '\\') !== FALSE){
+                $className = $type;
+            }else{
+                $className = '\\AmiLabs\\DevKit\\Request' . strtoupper($type);
+            }
             if(class_exists($className)){
                 self::$oDriver = new $className();
             }
