@@ -29,7 +29,7 @@ class TX {
                 $res = pack('H*', substr($aOut['scriptPubKey'], 4));
             }
         }
-        return ($asHex) ? pack('H*', $res) : $res;
+        return ($asHex) ? reset(unpack('H*', $res)) : $res;
     }
     /**
      * Adds OP_RETURN output to raw transaction hex.
