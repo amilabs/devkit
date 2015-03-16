@@ -3,7 +3,7 @@
 namespace AmiLabs\DevKit;
 
 use \AmiLabs\DevKit\Logger;
-use \AmiLabs\DevKit\RPC_JSON;
+use \AmiLabs\DevKit\RPCJSON;
 
 /**
  * Class for JSON RPC execution.
