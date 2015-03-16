@@ -2,6 +2,8 @@
 
 namespace AmiLabs\DevKit;
 
+use \AmiLabs\DevKit\Request;
+
 /**
  * Request with parameters ent through URI string driver.
  */
