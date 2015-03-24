@@ -11,15 +11,8 @@
             "homepage": "http://amilabs.co"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/ArtemKo7v/php-OP_RETURN"
-        }
-    ],
     "require": {
         "php": ">=5.3.1",
-        "artemko7v/php-op_return": "dev-master",
         "fguillot/json-rpc": "dev-master"
     },
     "autoload": {
