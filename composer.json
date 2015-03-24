@@ -12,8 +12,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.1",
-        "fguillot/json-rpc": "dev-master"
+        "php": ">=5.3.1"
     },
     "autoload": {
         "psr-0": {"AmiLabs\\DevKit": "src/"}
