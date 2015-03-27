@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  */
 namespace AmiLabs\DevKit;
 
@@ -46,7 +46,7 @@ class Registry {
      * List of entities in registry storage which cannot be changed anymore.
      *
      * @see \AmiLabs\DevKit\Registry::persist()
-     * @var array 
+     * @var array
      */
     protected $aPersistents = array();
     /**
