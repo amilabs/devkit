@@ -39,7 +39,7 @@ abstract class Daemon
      * @param  array $aOptions  Any options passed to Daemon::getStatePath()
      * @return void
      */
-    protected function saveState($aOptions)
+    protected function saveState(array $aOptions = array())
     {
         $path = $this->getStatePath($aOptions);
         file_put_contents(
