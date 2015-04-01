@@ -47,7 +47,7 @@ abstract class Daemon
             "<" . "?php\n\nreturn " . var_export($this->aState, TRUE) . ";\n\n"
         );
         if(FALSE === $result){
-            throw new ErrorException("Cannot save daemon state to '" . $path . "'");
+            throw new \ErrorException("Cannot save daemon state to '" . $path . "'");
         }
     }
 }
