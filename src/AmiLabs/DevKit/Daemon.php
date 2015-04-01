@@ -42,9 +42,12 @@ abstract class Daemon
     protected function saveState(array $aOptions = array())
     {
         $path = $this->getStatePath($aOptions);
-        file_put_contents(
+        $result = file_put_contents(
             $path,
             "<" . "?php\n\nreturn " . var_export($this->aState, TRUE) . ";\n\n"
         );
+        if(FALSE === $result){
+            throw new ErrorException("Cannot save daemon state to '" . $path . "'");
+        }
     }
 }
