@@ -54,7 +54,7 @@ interface ICache {
     /**
      * Returns cached data.
      */
-    public function get();
+    // public function get();
     /**
      * Stores cached data.
      *
@@ -75,13 +75,15 @@ class FileCache implements ICache{
      *
      * @var mixed
      */
-    protected $cachedData;
+    // protected $cachedData;
+
     /**
      * Cache filename
      *
      * @var string
      */
     protected $fileName;
+
     /**
      * Constructor.
      *
@@ -91,6 +93,7 @@ class FileCache implements ICache{
     public function __construct($name){
         $this->fileName = PATH_TMP . '/' . $name . '_cache.tmp';
     }
+
     /**
      * Returns true if cache file exists and is readable.
      *
@@ -99,26 +102,31 @@ class FileCache implements ICache{
     public function exists(){
         return file_exists($this->fileName) && is_readable($this->fileName);
     }
+
     /**
      * Loads cached data.
      *
      * @return mixed
      */
     public function load(){
-        $this->cachedData = file_get_contents($this->fileName);
-        return $this->cachedData;
+        // $this->cachedData = file_get_contents($this->fileName);
+        // return $this->cachedData;
+        return file_get_contents($this->fileName);
     }
     /**
      * Returns cached data.
      *
      * @return mixed
      */
+    /*
     public function get(){
         if(is_null($this->cachedData)){
             $this->load();
         }
         return $this->cachedData;
     }
+    */
+
     /**
      * Saves cached data.
      *
@@ -128,6 +136,7 @@ class FileCache implements ICache{
         file_put_contents($this->fileName, $data);
         chmod($this->fileName, 0777);
     }
+
     /**
      * Clears cached data.
      */
