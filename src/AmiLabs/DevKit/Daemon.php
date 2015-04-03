@@ -38,6 +38,7 @@ abstract class Daemon
      *
      * @param  array $aOptions  Any options passed to Daemon::getStatePath()
      * @return void
+     * @throws \ErrorException  If cannot save state
      */
     protected function saveState(array $aOptions = array())
     {
