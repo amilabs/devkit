@@ -17,6 +17,12 @@ class Logger {
      */
     private static $aLoggers = array();
     /**
+     * Is logger active
+     *
+     * @var bool
+     */
+    private $active = FALSE;
+    /**
      * Filename for a current logger
      *
      * @var string
@@ -29,11 +35,12 @@ class Logger {
      * @param boolean $bRewrite  Rewrite existing file if true
      */
     public function __construct($logFile, $bRewrite = false){
+        $this->active = Registry::useStorage('CFG')->get('debug/log', TRUE);
         // Sanitize filename: remove all restricted characters and sequences
         $logFile = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $logFile);
         $logFile = preg_replace("([\.]{2,})", '', $logFile);
         $this->logFile = PATH_LOG . '/' . $logFile . '.log';
-        if($bRewrite && file_exists($this->logFile)){
+        if($this->active && $bRewrite && file_exists($this->logFile)){
             unlink($this->logFile);
         }
         self::$aLoggers[$logFile] = $this;
@@ -49,7 +56,7 @@ class Logger {
     }
     /**
      * Logs message to a file.
-     * 
+     *
      * @todo Add message types (error, warning, notice, etc)
      * @param string $message
      */
@@ -61,7 +68,7 @@ class Logger {
         }else{
             $string = "============================================================================\r\n";
         }
-        if($string){
+        if($this->active && $string){
             file_put_contents($this->logFile, $string, FILE_APPEND);
         }
     }
