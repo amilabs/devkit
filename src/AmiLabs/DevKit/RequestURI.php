@@ -23,7 +23,7 @@ class RequestURI extends RequestDriver implements IRequestDriver {
         $aParts = array();
         $subfolder = '';
         foreach ($path as $key => $val) {
-            if($val === $parts[$key]){
+            if(isset($parts[$key]) && ($val === $parts[$key])){
                 $subfolder .= ('/' . $val);
                 unset($parts[$key]);
             } else {
