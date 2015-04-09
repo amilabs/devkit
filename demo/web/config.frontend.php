@@ -7,4 +7,6 @@
 
 if(!defined('AMILABS')) die;
 
-$aConfig += array();
+$aConfig += array(
+    // Frontend config data goes here
+);
