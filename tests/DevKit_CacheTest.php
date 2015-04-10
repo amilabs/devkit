@@ -38,7 +38,7 @@ class DevKit_CacheTest extends PHPUnit_Framework_TestCase{
      */
     public function testSanitize(){
         $oCache = Cache::get("x../x//../" . chr(0) . chr(7) . chr(255) . "x" . chr(13));
-        $this->assertEquals("xxx", $oCache->getFilename());
+        $this->assertEquals("xxx_cache.tmp", basename($oCache->getFilename()));
     }
 
     /**
