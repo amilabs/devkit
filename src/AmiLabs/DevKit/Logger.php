@@ -2,6 +2,8 @@
 
 namespace AmiLabs\DevKit;
 
+use \AmiLabs\DevKit\Utils;
+
 /**
  * Class for logging debug information.
  */
@@ -36,10 +38,7 @@ class Logger {
      */
     public function __construct($logFile, $bRewrite = false){
         $this->active = Registry::useStorage('CFG')->get('debug/log', TRUE);
-        // Sanitize filename: remove all restricted characters and sequences
-        $logFile = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $logFile);
-        $logFile = preg_replace("([\.]{2,})", '', $logFile);
-        $this->logFile = PATH_LOG . '/' . $logFile . '.log';
+        $this->logFile = PATH_LOG . '/' . Utils::sanitizeFilename($logFile) . '.log';
         if($this->active && $bRewrite && file_exists($this->logFile)){
             unlink($this->logFile);
         }

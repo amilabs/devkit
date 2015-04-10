@@ -2,6 +2,8 @@
 
 namespace AmiLabs\DevKit;
 
+use \AmiLabs\DevKit\Utils;
+
 /**
  * Abstract Cache class.
  */
@@ -84,7 +86,7 @@ class FileCache implements ICache{
      * @param string $name  Cache entry name
      */
     public function __construct($name){
-        $this->fileName = PATH_TMP . '/' . $name . '_cache.tmp';
+        $this->fileName = PATH_TMP . '/' . Utils::sanitizeFilename($name) . '_cache.tmp';
     }
 
     /**

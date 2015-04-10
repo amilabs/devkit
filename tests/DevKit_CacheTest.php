@@ -35,6 +35,14 @@ class DevKit_CacheTest extends PHPUnit_Framework_TestCase{
     /**
      * @covers \AmiLabs\DevKit\Cache::get
      */
+    public function testSanitize(){
+        $oCache = Cache::get("x../x//../" . chr(0) . chr(7) . chr(255) . "x" . chr(13));
+        $this->assertEquals("xxx", $oCache->getFilename());
+    }
+
+    /**
+     * @covers \AmiLabs\DevKit\Cache::get
+     */
     public function testCache(){
         $oCache = Cache::get($this->cacheFile);
         $this->assertEquals('AmiLabs\DevKit\FileCache', get_class($oCache));
