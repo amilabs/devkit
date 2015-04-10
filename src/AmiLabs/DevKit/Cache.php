@@ -82,7 +82,6 @@ class FileCache implements ICache{
     /**
      * Constructor.
      *
-     * @todo Sanitize name
      * @param string $name  Cache entry name
      */
     public function __construct($name){
