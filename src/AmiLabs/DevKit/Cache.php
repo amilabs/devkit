@@ -88,6 +88,15 @@ class FileCache implements ICache{
     }
 
     /**
+     * Returns cache filename.
+     *
+     * @return string
+     */
+    public function getFilename(){
+        return $this->fileName;
+    }
+
+    /**
      * Returns true if cache file exists and is readable.
      *
      * @return bool
