@@ -11,7 +11,7 @@ class DevKit_CacheTest extends PHPUnit_Framework_TestCase{
     protected $cacheFile;
 
     public function __construct(){
-        parent::____construct();
+        parent::___construct();
         $this->cacheFile = md5(time());
         // Remove previously created cache files if exist
         $oCache = Cache::get($this->cacheFile);
