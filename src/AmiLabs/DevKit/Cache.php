@@ -52,10 +52,6 @@ interface ICache {
      */
     public function load();
     /**
-     * Returns cached data.
-     */
-    // public function get();
-    /**
      * Stores cached data.
      *
      * @param mixed $data
@@ -71,11 +67,9 @@ interface ICache {
  */
 class FileCache implements ICache{
     /**
-     * Cached data
-     *
-     * @var mixed
+     * Cache file access mask
      */
-    // protected $cachedData;
+    const CHMOD = 0777;
 
     /**
      * Cache filename
@@ -83,7 +77,6 @@ class FileCache implements ICache{
      * @var string
      */
     protected $fileName;
-
     /**
      * Constructor.
      *
@@ -104,28 +97,36 @@ class FileCache implements ICache{
     }
 
     /**
-     * Loads cached data.
+     * Returns cache creation time.
+     *
+     * @return int
+     */
+    public function getTime(){
+        return $this->exists() ? filemtime($this->fileName) : 0;
+    }
+
+    /**
+     * Clear cache if it is older than specified amount of time in seconds.
+     *
+     * @param int $seconds  Cache lifetime in seconds
+     */
+    public function clearIfOlderThan($seconds){
+        $deleted = FALSE;
+        if((time() - $this->getTime()) > $seconds){
+            $this->clear();
+            $deleted = TRUE;
+        }
+        return $deleted;
+    }
+
+    /**
+     * Loads cache file.
      *
      * @return mixed
      */
     public function load(){
-        // $this->cachedData = file_get_contents($this->fileName);
-        // return $this->cachedData;
-        return file_get_contents($this->fileName);
+        return unserialize(file_get_contents($this->fileName));
     }
-    /**
-     * Returns cached data.
-     *
-     * @return mixed
-     */
-    /*
-    public function get(){
-        if(is_null($this->cachedData)){
-            $this->load();
-        }
-        return $this->cachedData;
-    }
-    */
 
     /**
      * Saves cached data.
@@ -133,8 +134,8 @@ class FileCache implements ICache{
      * @param mixed $data
      */
     public function save($data){
-        file_put_contents($this->fileName, $data);
-        chmod($this->fileName, 0777);
+        file_put_contents($this->fileName, serialize($data));
+        chmod($this->fileName, self::CHMOD);
     }
 
     /**
