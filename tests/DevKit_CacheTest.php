@@ -10,10 +10,17 @@ class DevKit_CacheTest extends PHPUnit_Framework_TestCase{
 
     protected $cacheFile;
 
-    public function testCache(){
+    public function __construct(){
+        parent::____construct();
         $this->cacheFile = md5(time());
+        // Remove previously created cache files if exist
         $oCache = Cache::get($this->cacheFile);
-        $this->assertEquals('FileCache', get_class($oCache));
+        @unlink($this->cacheFile);
+    }
+
+    public function testCache(){
+        $oCache = Cache::get($this->cacheFile);
+        $this->assertEquals('AmiLabs\DevKit\FileCache', get_class($oCache));
         $this->assertEquals(FALSE, file_exists($oCache->getFilename()));
     }
 
