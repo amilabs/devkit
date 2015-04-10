@@ -46,7 +46,7 @@ class DevKit_CacheTest extends PHPUnit_Framework_TestCase{
         $data = array('test' => array('a1' => array('b1', 'b2', 'b3'), 'a2' => 0.0001, 'a3' => TRUE));
         $serialized = serialize($data);
         file_put_contents($oCache->getFilename(), $serialized);
-        chmod($oCache->getFilename(), FileCache::CHMOD);
+        chmod($oCache->getFilename(), 0777);
         $data = $oCache->load();
         $this->assertEquals(TRUE, is_array($data));
         $this->assertEquals(TRUE, isset($data['test']));
