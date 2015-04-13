@@ -119,7 +119,7 @@ class Registry {
      * @see \AmiLabs\DevKit\Registry::PERSIST
      */
     public function set($key, $value, $mode = self::OVERWRITE){
-        if($this->isPersistant($key)){
+        if($this->isPersistent($key)){
             throw new \Exception('Attempt of writting to a read-only registry record');
         }
         if(self::ROOT === $key){
@@ -148,7 +148,7 @@ class Registry {
      */
     public function remove($key){
         $result = false;
-        if($this->exists($key) && !$this->isPersistant()){
+        if($this->exists($key) && !$this->isPersistent()){
             unset($this->aData[$key]);
             $result = true;
         }
@@ -177,7 +177,7 @@ class Registry {
      * @param mixed $key  Registry key, if not set - checks whole registry
      * @return boolean
      */
-    public function isPersistant($key = self::ROOT){
+    public function isPersistent($key = self::ROOT){
         return in_array(self::ROOT, $this->aPersistents) || in_array($key, $this->aPersistents);
     }
 
