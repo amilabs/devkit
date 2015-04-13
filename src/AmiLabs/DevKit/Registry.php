@@ -180,4 +180,13 @@ class Registry {
     public function isPersistant($key = self::ROOT){
         return in_array(self::ROOT, $this->aPersistents) || in_array($key, $this->aPersistents);
     }
+
+    public static function initialize(){
+        if(count(self::$aInstances)){
+            $keys = array_keys(self::$aInstances);
+            foreach($keys as $key){
+                unset(self::$aInstances[$key]);
+            }
+        }
+    }
 }
