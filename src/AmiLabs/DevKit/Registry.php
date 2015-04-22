@@ -12,36 +12,43 @@ class Registry {
      * Indicates registry root.
      */
     const ROOT = false;
+
     /**
      * Overwrite all existing keys.
      */
     const OVERWRITE = 0;
+
     /**
      * Append new keys only.
      */
     const APPEND = 1;
+
     /**
      * Set value and persist key.
      */
     const PERSIST = 2;
+
     /**
      * Registry storage instances
      *
      * @var array
      */
     protected static $aInstances = array();
+
     /**
      * Current project storage name
      *
      * @var string
      */
     protected $storageName;
+
     /**
      * Registry data
      *
      * @var array
      */
     protected $aData = array();
+
     /**
      * List of entities in registry storage which cannot be changed anymore.
      *
@@ -49,6 +56,7 @@ class Registry {
      * @var array
      */
     protected $aPersistents = array();
+
     /**
      * Adds new storage with specified name.
      *
@@ -64,6 +72,7 @@ class Registry {
         }
         return self::$aInstances[$name];
     }
+
     /**
      * Returns an existing storage with specified name.
      *
@@ -77,6 +86,7 @@ class Registry {
         }
         return self::$aInstances[$name];
     }
+
     /**
      * Returns true if specified key exists.
      *
@@ -86,6 +96,7 @@ class Registry {
     public function exists($key){
         return isset($this->aData[$key]);
     }
+
     /**
      * Returns value of data stored in registry.
      *
@@ -100,14 +111,27 @@ class Registry {
             foreach($aKeys as $subKey){
                 if(isset($aData[$subKey])){
                     $aData = $aData[$subKey];
+                }elseif(is_null($default)){
+                    trigger_error(sprintf("Key '%s' not found", $key));
                 }else{
                     return $default;
                 }
             }
             return $aData;
         }
-        return (self::ROOT === $key) ? $aData : ($this->exists($key) ? $aData[$key] : $default);
+
+        if(self::ROOT === $key){
+            return $aData;
+        }
+        if($this->exists($key)){
+            return $aData[$key];
+        }elseif(is_null($default)){
+            trigger_error(sprintf("Key '%s' not found", $key));
+        }
+
+        return $default;
     }
+
     /**
      * Stores a value in registry by specified name.
      *
@@ -140,6 +164,7 @@ class Registry {
             $this->persist($key);
         }
     }
+
     /**
      * Removes specified entity from storage.
      *
@@ -154,6 +179,7 @@ class Registry {
         }
         return $result;
     }
+
     /**
      * Makes registry entry readonly.
      *
@@ -171,6 +197,7 @@ class Registry {
             $this->aPersistents = array(self::ROOT);
         }
     }
+
     /**
      * Returns true if specified entity is read-only.
      *
