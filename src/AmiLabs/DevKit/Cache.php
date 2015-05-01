@@ -145,7 +145,7 @@ class FileCache implements ICache{
      */
     public function save($data){
         file_put_contents($this->fileName, serialize($data));
-        chmod($this->fileName, self::CHMOD);
+        @chmod($this->fileName, self::CHMOD);
     }
 
     /**
