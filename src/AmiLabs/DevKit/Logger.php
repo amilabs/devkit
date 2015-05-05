@@ -35,9 +35,10 @@ class Logger {
      *
      * @param string $logFile    Filename to log debug data
      * @param boolean $bRewrite  Rewrite existing file if true
+     * @param boolean $bActive   Will not write to log if set to FALSE
      */
-    public function __construct($logFile, $bRewrite = false){
-        $this->active = Registry::useStorage('CFG')->get('debug/log', TRUE);
+    public function __construct($logFile, $bRewrite = FALSE, $bActive = TRUE){
+        $this->active = Registry::useStorage('CFG')->get('debug/log', TRUE) && $bActive;
         $this->logFile = PATH_LOG . '/' . Utils::sanitizeFilename($logFile) . '.log';
         if($this->active && $bRewrite && file_exists($this->logFile)){
             unlink($this->logFile);
