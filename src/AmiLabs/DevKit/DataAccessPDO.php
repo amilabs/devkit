@@ -175,4 +175,14 @@ abstract class DataAccessPDO{
             }
         }
     }
+
+    /**
+     * Sanitizes field name.
+     *
+     * @param  string $field
+     * @return string
+     */
+    protected function sanitizeFieldName($field){
+        return str_replace(array('`', '"', "'"), '', $field);
+    }
 }
