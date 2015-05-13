@@ -2,6 +2,7 @@
 
 namespace AmiLabs\DevKit\UnitTests;
 
+use PHPUnit_Framework_TestCase;
 use \AmiLabs\DevKit\Cache;
 
 define('PATH_TMP', rtrim(sys_get_temp_dir(), '/'));
