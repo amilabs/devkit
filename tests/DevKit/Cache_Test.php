@@ -1,12 +1,18 @@
 <?php
 
+namespace \AmiLabs\DevKit\UnitTests;
+
 use \AmiLabs\DevKit\Cache;
 
 define('PATH_TMP', rtrim(sys_get_temp_dir(), '/'));
+require_once realpath(__FILE__) . '/../../src/AmiLabs/DevKit/Cache.php';
+require_once realpath(__FILE__) . '/../../src/AmiLabs/DevKit/Utils.php';
 
-require_once __DIR__ . '/../../src/AmiLabs/DevKit/Cache.php';
-require_once __DIR__ . '/../../src/AmiLabs/DevKit/Utils.php';
-
+/**
+ * Unit tests.
+ *
+ * @package \AmiLabs\DevKit\UnitTests
+ */
 class Cache_Test extends PHPUnit_Framework_TestCase{
     /**
      * Random cache id
@@ -34,7 +40,7 @@ class Cache_Test extends PHPUnit_Framework_TestCase{
     }
 
     /**
-     * @covers \AmiLabs\DevKit\Cache::get
+     * @covers \AmiLabs\DevKit\Cache::get()
      */
     public function testSanitize(){
         $oCache = Cache::get("x../x//../" . chr(0) . chr(7) . chr(255) . "x" . chr(13));
@@ -42,7 +48,7 @@ class Cache_Test extends PHPUnit_Framework_TestCase{
     }
 
     /**
-     * @covers \AmiLabs\DevKit\Cache::get
+     * @covers \AmiLabs\DevKit\Cache::get()
      */
     public function testCache(){
         $oCache = Cache::get($this->cacheFile);
@@ -51,9 +57,9 @@ class Cache_Test extends PHPUnit_Framework_TestCase{
     }
 
     /**
-     * @covers \AmiLabs\DevKit\FileCache::exists
-     * @covers \AmiLabs\DevKit\FileCache::save
-     * @covers \AmiLabs\DevKit\FileCache::clear
+     * @covers \AmiLabs\DevKit\FileCache::exists()
+     * @covers \AmiLabs\DevKit\FileCache::save()
+     * @covers \AmiLabs\DevKit\FileCache::clear()
      */
     public function testExistsSaveClear(){
         $oCache = Cache::get($this->cacheFile);
@@ -68,7 +74,7 @@ class Cache_Test extends PHPUnit_Framework_TestCase{
     }
 
     /**
-     * @covers \AmiLabs\DevKit\FileCache::save
+     * @covers \AmiLabs\DevKit\FileCache::save()
      */
     public function testSave(){
         $oCache = Cache::get($this->cacheFile);
@@ -82,7 +88,7 @@ class Cache_Test extends PHPUnit_Framework_TestCase{
     }
 
     /**
-     * @covers \AmiLabs\DevKit\FileCache::load
+     * @covers \AmiLabs\DevKit\FileCache::load()
      */
     public function testLoad(){
         $oCache = Cache::get($this->cacheFile);
@@ -101,7 +107,7 @@ class Cache_Test extends PHPUnit_Framework_TestCase{
     }
 
     /**
-     * @covers \AmiLabs\DevKit\FileCache::clearIfOlderThan
+     * @covers \AmiLabs\DevKit\FileCache::clearIfOlderThan()
      */
     public function testClearIfOlderThan(){
         $oCache = Cache::get($this->cacheFile);
