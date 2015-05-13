@@ -1,12 +1,12 @@
 <?php
 
-namespace \AmiLabs\DevKit\UnitTests;
+namespace AmiLabs\DevKit\UnitTests;
 
 use \AmiLabs\DevKit\Cache;
 
 define('PATH_TMP', rtrim(sys_get_temp_dir(), '/'));
-require_once realpath(__FILE__) . '/../../src/AmiLabs/DevKit/Cache.php';
-require_once realpath(__FILE__) . '/../../src/AmiLabs/DevKit/Utils.php';
+require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Cache.php';
+require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Utils.php';
 
 /**
  * Unit tests.
