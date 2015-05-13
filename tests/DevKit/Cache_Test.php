@@ -4,8 +4,8 @@ use \AmiLabs\DevKit\Cache;
 
 define('PATH_TMP', rtrim(sys_get_temp_dir(), '/'));
 
-require_once __DIR__ . '/../src/AmiLabs/DevKit/Cache.php';
-require_once __DIR__ . '/../src/AmiLabs/DevKit/Utils.php';
+require_once __DIR__ . '/../../src/AmiLabs/DevKit/Cache.php';
+require_once __DIR__ . '/../../src/AmiLabs/DevKit/Utils.php';
 
 class Cache_Test extends PHPUnit_Framework_TestCase{
     /**
