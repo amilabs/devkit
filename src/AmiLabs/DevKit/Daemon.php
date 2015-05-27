@@ -4,6 +4,8 @@ namespace AmiLabs\DevKit;
 
 abstract class Daemon
 {
+    const FILE_MODE = 0666;
+
     /**
      * @var array
      */
@@ -47,6 +49,7 @@ abstract class Daemon
             $path,
             "<" . "?php\n\nreturn " . var_export($this->aState, TRUE) . ";\n\n"
         );
+        @chmod($path, self::FILE_MODE);
         if(FALSE === $result){
             throw new \ErrorException("Cannot save daemon state to '" . $path . "'");
         }
