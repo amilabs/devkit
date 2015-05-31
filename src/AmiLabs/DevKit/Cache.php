@@ -2,8 +2,7 @@
 
 namespace AmiLabs\DevKit;
 
-use \AmiLabs\DevKit\Utils;
-use \AmiLabs\DevKit\Utility\Files;
+use AmiLabs\DevKit\Utils;
 
 /**
  * Abstract Cache class.
@@ -69,11 +68,6 @@ interface ICache {
  * File cache driver.
  */
 class FileCache implements ICache{
-    /**
-     * Cache file access mask
-     */
-    const CHMOD = 0777;
-
     /**
      * Cache filename
      *
@@ -145,8 +139,7 @@ class FileCache implements ICache{
      * @param mixed $data
      */
     public function save($data){
-        Files::saveFile($this->fileName, serialize($data));
-        @chmod($this->fileName, self::CHMOD);
+        Utils::saveFile($this->fileName, serialize($data));
     }
 
     /**

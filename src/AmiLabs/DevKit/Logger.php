@@ -2,9 +2,7 @@
 
 namespace AmiLabs\DevKit;
 
-use \AmiLabs\DevKit\Utils;
-
-use \AmiLabs\DevKit\Utility\Files;
+use AmiLabs\DevKit\Utils;
 
 /**
  * Class for logging debug information.
@@ -71,7 +69,7 @@ class Logger {
             $string = "============================================================================\r\n";
         }
         if($this->active && $string){
-            Files::saveFile($this->logFile, $string, FILE_APPEND);
+            Utils::saveFile($this->logFile, $string, FILE_APPEND);
         }
     }
 }
