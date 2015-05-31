@@ -3,6 +3,7 @@
 namespace AmiLabs\DevKit;
 
 use \AmiLabs\DevKit\Utils;
+use \AmiLabs\DevKit\Utility\Files;
 
 /**
  * Abstract Cache class.
@@ -144,7 +145,7 @@ class FileCache implements ICache{
      * @param mixed $data
      */
     public function save($data){
-        file_put_contents($this->fileName, serialize($data));
+        Files::saveFile($this->fileName, serialize($data));
         @chmod($this->fileName, self::CHMOD);
     }
 

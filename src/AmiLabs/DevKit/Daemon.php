@@ -2,10 +2,13 @@
 
 namespace AmiLabs\DevKit;
 
+use \AmiLabs\DevKit\Utility\Files;
+
+/**
+ * Daemon abstarct class implementing saving/loading daemon state.
+ */
 abstract class Daemon
 {
-    const FILE_MODE = 0666;
-
     /**
      * @var array
      */
@@ -45,11 +48,10 @@ abstract class Daemon
     protected function saveState(array $aOptions = array())
     {
         $path = $this->getStatePath($aOptions);
-        $result = file_put_contents(
+        $result = Files::saveFile(
             $path,
             "<" . "?php\n\nreturn " . var_export($this->aState, TRUE) . ";\n\n"
         );
-        @chmod($path, self::FILE_MODE);
         if(FALSE === $result){
             throw new \ErrorException("Cannot save daemon state to '" . $path . "'");
         }
