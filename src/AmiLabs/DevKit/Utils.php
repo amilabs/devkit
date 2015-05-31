@@ -33,7 +33,7 @@ class Utils
      * @param  int    $mode     File mode ({@see http://php.net/manual/en/function.chmod.php})
      * @return bool
      */
-    public static function saveFile($path, $content, $flags, $mode = 0666){
+    public static function saveFile($path, $content, $flags = 0, $mode = 0666){
         $res = FALSE;
         $res = file_put_contents($path, $content, $flags);
         if($res){
