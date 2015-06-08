@@ -163,6 +163,7 @@ class Registry {
         if($mode & self::PERSIST){
             $this->persist($key);
         }
+        return $this;
     }
 
     /**
