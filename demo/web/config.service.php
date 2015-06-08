@@ -5,8 +5,6 @@
  * Copy tis file to config.service.local.php before making any changes.
  */
 
-if(!defined('AMILABS')) die;
-
 $aConfig += array(
     // Service config data goes here
 );

@@ -80,7 +80,9 @@ class FileCache implements ICache{
      * @param string $name  Cache entry name
      */
     public function __construct($name){
-        $this->fileName = PATH_TMP . '/' . Utils::sanitizeFilename($name) . '_cache.tmp';
+        $this->fileName =
+            Registry::useStorage('CFG')->get('path/tmp') .
+            '/' . Utils::sanitizeFilename($name) . '_cache.tmp';
     }
 
     /**

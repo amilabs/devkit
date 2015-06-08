@@ -5,8 +5,6 @@
  * Copy tis file to config.frontend.local.php before making any changes.
  */
 
-if(!defined('AMILABS')) die;
-
 $aConfig += array(
     // Frontend config data goes here
 );

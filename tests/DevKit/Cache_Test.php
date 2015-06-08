@@ -3,9 +3,9 @@
 namespace AmiLabs\DevKit\UnitTests;
 
 use PHPUnit_Framework_TestCase;
-use \AmiLabs\DevKit\Cache;
+use AmiLabs\DevKit\Cache;
+use AmiLabs\DevKit\Registry;
 
-define('PATH_TMP', rtrim(sys_get_temp_dir(), '/'));
 require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Cache.php';
 require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Utils.php';
 
@@ -34,10 +34,21 @@ class Cache_Test extends PHPUnit_Framework_TestCase{
      */
     public function __construct(){
         parent::__construct();
+
+        // Sets temporary storage for cache files
+        Registry::addStorage('CFG')->set(
+            Registry::ROOT,
+            array(
+                'path' => array(
+                    'tmp' => rtrim(sys_get_temp_dir(), '/')
+                )
+            ),
+            Registry::PERSIST
+        );
         $this->cacheFile = md5(time());
         // Remove previously created cache files if exist
         $oCache = Cache::get($this->cacheFile);
-        @unlink($this->cacheFile);
+        $oCache->clear();
     }
 
     /**

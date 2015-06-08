@@ -61,7 +61,7 @@ class Template {
      */
     protected function getGlobalScope(){
         return array(
-            'baseUrl' => OAZ_BASE_URL
+            'baseUrl' => PATH_WWW
         );
     }
     /**

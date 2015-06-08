@@ -1,13 +1,15 @@
 <?php
 /**
  * Project configuration.
- * 
+ *
  * @todo Documentation how to make local config file.
  */
 use AmiLabs\DevKit\Registry;
 
-// Project flag used to check if every php file runs in proper environment.
-define('AMILABS', true);
+// Temporary
+if(!isset($appName)){
+    $appName = defined('APP_NAME') ? APP_NAME : '';
+}
 
 // Default project configuration.
 $aConfig = array(
@@ -17,7 +19,7 @@ $aConfig = array(
         // Libraries
         'lib' => realpath(dirname(__FILE__) . '/../vendor'),
         // Application classes
-        'app' => realpath(dirname(__FILE__) . '/../app' . (defined('APP_NAME') ? '/' . APP_NAME : '')),
+        'app' => realpath(rtrim(dirname(__FILE__) . '/../app/' . $appName, '/')),
         // Temporary files
         'tmp' => realpath(dirname(__FILE__) . '/../tmp'),
         // Logs and other debug files
@@ -26,21 +28,14 @@ $aConfig = array(
 );
 
 // Check if local application config file is present. Will use default config if not.
-$cfgFile = (defined('APP_NAME')) ? (APP_NAME . '.') : '';
+$cfgFile = $appName ? $appName . '.' : '';
 if(file_exists('config.' . $cfgFile . 'local.php')){
     require_once 'config.' . $cfgFile . 'local.php';
 }elseif($cfgFile && file_exists('config.' . $cfgFile . 'php')){
     require_once 'config.' . $cfgFile . 'php';
 }
 
-// Set path constants.
-define('PATH_WWW', $aConfig['path']['www']);
-define('PATH_LIB', $aConfig['path']['lib']);
-define('PATH_APP', $aConfig['path']['app']);
-define('PATH_TMP', $aConfig['path']['tmp']);
-define('PATH_LOG', $aConfig['path']['log']);
-
-require_once PATH_LIB . '/autoload.php';
+require_once $aConfig['path']['lib'] . '/autoload.php';
 
 // Initialize environment registry
 Registry::addStorage('ENV');

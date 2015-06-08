@@ -39,7 +39,9 @@ class Logger {
      */
     public function __construct($logFile, $bRewrite = FALSE, $bActive = TRUE){
         $this->active = Registry::useStorage('CFG')->get('debug/log', TRUE) && $bActive;
-        $this->logFile = PATH_LOG . '/' . Utils::sanitizeFilename($logFile) . '.log';
+        $this->logFile =
+            Registry::useStorage('CFG')->get('path/log') .
+            '/' . Utils::sanitizeFilename($logFile) . '.log';
         if($this->active && $bRewrite && file_exists($this->logFile)){
             unlink($this->logFile);
         }

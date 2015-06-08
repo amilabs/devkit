@@ -16,6 +16,13 @@ class Application{
      * @var \AmiLabs\DevKit\Application
      */
     protected static $oInstance = null;
+
+    /**
+     * @todo Separate config for every application
+     * @var Application configuation
+     */
+    protected $oConfig;
+
     /**
      * Singleton implementation.
      *
@@ -55,7 +62,17 @@ class Application{
      * @return \AmiLabs\DevKit\RequestURI
      */
     public function getRequest(){
-        return Request::getInstance(Registry::useStorage('CFG')->get('request/type', 'uri'));
+        return Request::getInstance(
+            $this->oConfig->get('request/type', 'uri')
+        );
+    }
+    /**
+     * Returns application configuration.
+     *
+     * @return mixed
+     */
+    public function getConfig(){
+        return $this->oConfig;
     }
     /**
      * Runs controller.
@@ -67,11 +84,8 @@ class Application{
         $controller = $oRequest->getControllerName();
         $action = $oRequest->getActionName();
         $className = $controller . 'Controller';
-        /**
-         * action + Name
-         */
-        $methodName = 'action' . ucfirst($action);
-        $fileName = PATH_APP . '/controllers/' . $className . '.php';
+        $methodName = 'action' . ucfirst($action); // action + Name
+        $fileName = $this->oConfig->get('path/app') . '/controllers/' . $className . '.php';
         if(file_exists($fileName)){
             require_once $fileName;
             if(class_exists($className) && method_exists($className, $methodName)){
@@ -97,6 +111,6 @@ class Application{
      * Constructor.
      */
     protected function __construct(){
-        // $this->getDatabase()->connect();
+        $this->oConfig = Registry::useStorage('CFG');
     }
 }

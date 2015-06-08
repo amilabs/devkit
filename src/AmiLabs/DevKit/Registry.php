@@ -138,7 +138,7 @@ class Registry {
      * @param string $key   Data entry name, self::ROOT write the value over registry root
      * @param mixed $value  Data value, must be of array type if written to the root
      * @param int $mode     Write mode: combination of flags Registry::REWRITE, Registry::APPEND, Registry::PERSIST
-     * @see \AmiLabs\DevKit\Registry::REWRITE
+     * @see \AmiLabs\DevKit\Registry::OVERWRITE
      * @see \AmiLabs\DevKit\Registry::APPEND
      * @see \AmiLabs\DevKit\Registry::PERSIST
      */
