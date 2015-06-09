@@ -82,7 +82,7 @@ class FileCache implements ICache{
     public function __construct($name){
         $this->fileName =
             Registry::useStorage('CFG')->get('path/tmp') .
-            '/' . File::sanitizeFilename($name) . '_cache.tmp';
+            '/' . FS::sanitizeFilename($name) . '_cache.tmp';
     }
 
     /**
