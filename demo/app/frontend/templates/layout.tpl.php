@@ -1,4 +1,3 @@
-<?php if(!defined('AMILABS')) die() ?>
 <html>
 <head>
   <title>AmiLabs DevKit Demo</title>

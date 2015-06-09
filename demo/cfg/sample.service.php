@@ -2,7 +2,7 @@
 /**
  * Sample configuration file for HTTP service working with mainnet blockchain node.
  *
- * Copy tis file to config.service.local.php before making any changes.
+ * Copy this file to config.service.php before making any changes.
  */
 
 $aConfig += array(

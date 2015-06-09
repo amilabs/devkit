@@ -2,8 +2,7 @@
 /**
  * Backend
  */
-define('APP_NAME', 'service');
-
-require_once 'config.php';
+$appName = 'service';
+require_once '../app/init.php';
 
 \AmiLabs\DevKit\Application::getInstance()->run();

@@ -2,12 +2,7 @@
 /**
  * Frontend
  */
+$appName = 'frontend';
+require_once '../app/init.php';
 
-use \AmiLabs\DevKit\Application;
-
-define('APP_NAME', 'frontend');
-
-require_once 'config.php';
-
-$oApp = Application::getInstance();
-$oApp->run();
+\AmiLabs\DevKit\Application::getInstance()->run();

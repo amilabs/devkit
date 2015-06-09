@@ -13,5 +13,9 @@
         "amilabs/devkit": "dev-develop",
         "artemko7v/php-op_return": "dev-master",
         "fguillot/json-rpc": "dev-master"
+    },
+   "scripts": {
+        "post-update-cmd":  "AmiLabs\\DevKit\\Utility\\Composer::postUpdate",
+        "post-install-cmd": "AmiLabs\\DevKit\\Utility\\Composer::postInstall"
     }
 }

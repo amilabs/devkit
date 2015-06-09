@@ -2,6 +2,8 @@
 
 namespace AmiLabs\DevKit;
 
+use AmiLabs\DevKit\Registry;
+
 /**
  * Template engine
  */
@@ -31,9 +33,10 @@ class Template {
      * @return string
      */
     public function get($name, array $aScope = array()){
+        $pathApp = Registry::useStorage('CFG')->get('path/app');
         $aScope += $this->getGlobalScope();
         extract($aScope);
-        $fileName = PATH_APP . '/templates/' . $name . '.tpl.php';
+        $fileName = $pathApp . '/templates/' . $name . '.tpl.php';
         if(file_exists($fileName)){
             ob_start();
             include($fileName);
@@ -61,7 +64,6 @@ class Template {
      */
     protected function getGlobalScope(){
         return array(
-            'baseUrl' => PATH_WWW
         );
     }
     /**

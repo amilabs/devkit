@@ -13,6 +13,18 @@ class Logger {
      */
     const DELIMITER = '---';
     /**
+     * Database logs storage
+     */
+    const STORAGE_DB = 0x01;
+    /**
+     * File logs storage
+     */
+    const STORAGE_FILE = 0x02;
+    /**
+     * Use all storages
+     */
+    const STORAGE_ALL = 0xFF;
+    /**
      * Array of loggers
      *
      * @var array
@@ -37,7 +49,7 @@ class Logger {
      * @param boolean $bRewrite  Rewrite existing file if true
      * @param boolean $bActive   Will not write to log if set to FALSE
      */
-    public function __construct($logFile, $bRewrite = FALSE, $bActive = TRUE){
+    protected function __construct($logFile, $bRewrite = FALSE, $bActive = TRUE){
         $this->active = Registry::useStorage('CFG')->get('debug/log', TRUE) && $bActive;
         $this->logFile =
             Registry::useStorage('CFG')->get('path/log') .

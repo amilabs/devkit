@@ -2,7 +2,7 @@
 
 namespace AmiLabs\DevKit;
 
-use AmiLabs\DevKit\Utils;
+use AmiLabs\DevKit\Utility\FS;
 
 /**
  * Abstract Cache class.
@@ -82,7 +82,7 @@ class FileCache implements ICache{
     public function __construct($name){
         $this->fileName =
             Registry::useStorage('CFG')->get('path/tmp') .
-            '/' . Utils::sanitizeFilename($name) . '_cache.tmp';
+            '/' . File::sanitizeFilename($name) . '_cache.tmp';
     }
 
     /**
@@ -132,7 +132,7 @@ class FileCache implements ICache{
      * @return mixed
      */
     public function load(){
-        return unserialize(file_get_contents($this->fileName));
+        return unserialize(FS::readFile($this->fileName));
     }
 
     /**
@@ -141,15 +141,13 @@ class FileCache implements ICache{
      * @param mixed $data
      */
     public function save($data){
-        Utils::saveFile($this->fileName, serialize($data));
+        FS::saveFile($this->fileName, serialize($data));
     }
 
     /**
      * Clears cached data.
      */
     public function clear(){
-        if($this->exists()){
-            unlink($this->fileName);
-        }
+        FS::deleteFile($this->fileName);
     }
 }

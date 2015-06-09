@@ -10,8 +10,8 @@ class indexController extends Controller {
      * @param \AmiLabs\DevKit\Application $oApp        Application object
      * @param \AmiLabs\DevKit\RequestDriver $oRequest  Request driver
      */
-    public function actionTest($oApp, $oRequest){
-        $this->getView()->set('result', 'Hello World!');
-        $this->getView()->set('request',  $oRequest->getCallParameters());
+    public function actionIndex($oApp, $oRequest){
+        echo json_encode(array('result' => 'Hello World!'));
+	die();
     }
 }

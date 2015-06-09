@@ -2,7 +2,7 @@
 
 namespace AmiLabs\DevKit;
 
-use \AmiLabs\DevKit\Utils;
+use \AmiLabs\DevKit\Utility\FS;
 
 /**
  * Daemon abstarct class implementing saving/loading daemon state.
@@ -48,7 +48,7 @@ abstract class Daemon
     protected function saveState(array $aOptions = array())
     {
         $path = $this->getStatePath($aOptions);
-        $result = Utils::saveFile(
+        $result = FS::saveFile(
             $path,
             "<" . "?php\n\nreturn " . var_export($this->aState, TRUE) . ";\n\n"
         );
