@@ -2,7 +2,7 @@
 
 namespace AmiLabs\DevKit;
 
-use AmiLabs\DevKit\Utils;
+use AmiLabs\DevKit\Utility\FS;
 
 /**
  * Class for logging debug information.
@@ -53,7 +53,7 @@ class Logger {
         $this->active = Registry::useStorage('CFG')->get('debug/log', TRUE) && $bActive;
         $this->logFile =
             Registry::useStorage('CFG')->get('path/log') .
-            '/' . Utils::sanitizeFilename($logFile) . '.log';
+            '/' . FS::sanitizeFilename($logFile) . '.log';
         if($this->active && $bRewrite && file_exists($this->logFile)){
             unlink($this->logFile);
         }
@@ -83,7 +83,7 @@ class Logger {
             $string = "============================================================================\r\n";
         }
         if($this->active && $string){
-            Utils::saveFile($this->logFile, $string, FILE_APPEND);
+            FS::saveFile($this->logFile, $string, FILE_APPEND);
         }
     }
 }
