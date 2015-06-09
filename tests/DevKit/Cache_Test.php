@@ -8,7 +8,7 @@ use AmiLabs\DevKit\Registry;
 
 require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Cache.php';
 require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Registry.php';
-require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Utils.php';
+require_once realpath(dirname(__FILE__)) . '/../../src/AmiLabs/DevKit/Utility/FS.php';
 
 /**
  * Unit tests.
