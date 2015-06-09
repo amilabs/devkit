@@ -51,7 +51,7 @@ interface IDataAccessLayer{
      * @param  string $value
      * @return mixed  NULL if not found
      */
-    public function getLinkByValue($key);
+    public function getLinkByValue($value);
 
     /**
      * Writes data to log.

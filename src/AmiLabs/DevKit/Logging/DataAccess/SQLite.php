@@ -3,6 +3,7 @@
 namespace AmiLabs\DevKit\Logging\DataAccess;
 
 use PDO;
+use PDOStatement;
 use AmiLabs\DevKit\DataAccessPDO;
 use AmiLabs\DevKit\Logging\IDataAccessLayer;
 
@@ -25,6 +26,30 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
     protected $aOptions;
 
     /**
+     * @var PDOStatement
+     */
+    protected $oStmtCreateLink;
+
+    /**
+     * @var PDOStatement
+     */
+    protected $oStmtDeleteLink;
+
+    /**
+     * @var PDOStatement
+     */
+    protected $oStmtLinkByKey;
+
+    /**
+     * @var PDOStatement
+     */
+    protected $oStmtLinkByValue;
+
+
+
+
+
+    /**
      * @param string $name
      * @param array  $aOptions
      */
@@ -33,6 +58,34 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
         $this->aOptions = $aOptions;
 
         $this->connect($aOptions['AmiLabs\\DevKit\\Logging\\DataAccess']);
+
+        $query =
+            "INSERT INTO `logging_service_link` " .
+            "(`date`, `service`, `key`, `value`) " .
+            "VALUES " .
+            "(:date, :service, :key, :value)";
+        $this->oStmtCreateLink = $this->oDB->prepare($query);
+
+        $query =
+            "DELETE FROM `logging_service_link` " .
+            "WHERE `key` = :key";
+        $this->oStmtDeleteLink = $this->oDB->prepare($query);
+
+        $query =
+            "SELECT `value` FROM `logging_service_link` " .
+            "WHERE " .
+                "`service` = :service AND " .
+                "`key` = :key " .
+                "LIMIT 1";
+        $this->oStmtLinkByKey = $this->oDB->prepare($query);
+
+        $query =
+            "SELECT `value` FROM `logging_service_link` " .
+            "WHERE " .
+                "`service` = :service AND " .
+                "`value` = :value " .
+                "LIMIT 1";
+        $this->oStmtLinkByValue = $this->oDB->prepare($query);
     }
 
     /**
@@ -43,7 +96,13 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      * @return void
      */
     public function createLink($key, $value){
-
+        $aRecord = array(
+            'date'  => date('Y-m-d H:i:s'),
+            'key'   => $key,
+            'value' => $value,
+        );
+        $this->prepareRecord($aRecord);
+        $this->oStmtCreateLink->execute($aRecord);
     }
 
     /**
@@ -53,7 +112,11 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      * @return void
      */
     public function deleteLink($key){
-
+        $aRecord = array(
+            'key' => $key,
+        );
+        $this->prepareRecord($aRecord);
+        $this->oStmtDeleteLink->execute($aRecord);
     }
 
     /**
@@ -63,7 +126,14 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      * @return mixed  NULL if not found
      */
     public function getLinkByKey($key){
+        $aRecord = array(
+            'key' => $key,
+        );
+        $this->prepareRecord($aRecord);
+        $this->oStmtLinkByKey->execute($aRecord);
+        $aRow = $this->oStmtKey->fetch(PDO::FETCH_ASSOC);
 
+        return $aRow ? $aRow : NULL;
     }
 
     /**
@@ -72,8 +142,15 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      * @param  string $value
      * @return mixed  NULL if not found
      */
-    public function getLinkByValue($key){
+    public function getLinkByValue($value){
+        $aRecord = array(
+            'value' => $value,
+        );
+        $this->prepareRecord($aRecord);
+        $this->oStmtLinkByKey->execute($aRecord);
+        $aRow = $this->oStmtKey->fetch(PDO::FETCH_ASSOC);
 
+        return $aRow ? $aRow : NULL;
     }
 
     /**
