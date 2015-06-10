@@ -41,7 +41,7 @@ abstract class DataAccessPDO{
     protected function prepareRecord(array &$aRecord){
         $aKeys = array_keys($aRecord);
         foreach($aKeys as $key){
-            $aRecord[':' . $key] = $aRecord[$key];
+            $aRecord[':' . $this->sanitizeFieldName($key)] = $aRecord[$key];
             unset($aRecord[$key]);
         }
     }
