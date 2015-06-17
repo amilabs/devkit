@@ -69,7 +69,7 @@ class FS
     {
         $res = FALSE;
         if(file_exists($path)){
-            $res = unlink($path);
+            $res = @unlink($path);
         }
         return $res;
     }
