@@ -102,7 +102,9 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
 
         $query =
             "DELETE FROM `logging_service_data` " .
-            "WHERE `key` = :key";
+            "WHERE " .
+                "`service` = :service AND " .
+                "`key` = :key ";
         $this->oStmtCleanup = $this->oDB->prepare($query);
     }
 
@@ -229,7 +231,8 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      */
     public function cleanup($key){
         $aRecord = array(
-            'key' => $key,
+            'service' => $this->service,
+            'key'     => $key,
         );
         $this->prepareRecord($aRecord);
         $this->oStmtCleanup->execute($aRecord);
