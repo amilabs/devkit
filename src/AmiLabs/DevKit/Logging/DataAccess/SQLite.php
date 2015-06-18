@@ -56,14 +56,13 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
     protected $oStmtCleanup;
 
     /**
-     * @param string $service
      * @param array  $aOptions
      */
-    public function __construct($service, array $aOptions){
-        $this->service  = $service;
+    public function __construct(array $aOptions){
+        $this->service  = $aOptions['serviceName'];
         $this->aOptions = $aOptions;
 
-        $this->connect($aOptions['AmiLabs\\DevKit\\Logging\\DataAccess']);
+        $this->connect($aOptions['DataAccess']);
 
         $query =
             "INSERT INTO `logging_service_link` " .
