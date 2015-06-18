@@ -19,20 +19,20 @@ class RequestURI extends RequestDriver implements IRequestDriver {
      */
     public function __construct(){
         $path = explode('/', trim($_SERVER['SCRIPT_NAME'], '/'));
-        $parts  = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+        $parts = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+        array_walk($parts, array($this, 'stripGetAgrs'));
         $aParts = array();
         $subfolder = '';
         foreach ($path as $key => $val) {
             if(isset($parts[$key]) && ($val === $parts[$key])){
+                // var_dump($val);###
                 $subfolder .= ('/' . $val);
                 unset($parts[$key]);
             } else {
                 break;
             }
         }
-        foreach($parts as $part){
-            $aParts[] = $part;
-        }
+        $aParts = $parts;
         Registry::useStorage('ENV')->set('subfolder', $subfolder);
         if((count($aParts) > 1) && $aParts[1]){
             $this->controllerName = $aParts[1];
@@ -69,5 +69,15 @@ class RequestURI extends RequestDriver implements IRequestDriver {
      */
     public function getScopePOST(){
         return $_POST;
+    }
+
+    /**
+     * Strips everything exclude PATH part.
+     *
+     * @param  string $value
+     * @return void
+     */
+    protected function stripGetAgrs(&$value){
+        $value = parse_url($value, PHP_URL_PATH);
     }
 }

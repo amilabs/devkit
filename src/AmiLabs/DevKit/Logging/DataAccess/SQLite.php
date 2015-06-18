@@ -18,7 +18,7 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      *
      * @var string
      */
-    protected $name;
+    protected $service;
 
     /**
      * @var array
@@ -45,19 +45,24 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      */
     protected $oStmtLinkByValue;
 
-
-
-
+    /**
+     * @var PDOStatement
+     */
+    protected $oStmtWrite;
 
     /**
-     * @param string $name
+     * @var PDOStatement
+     */
+    protected $oStmtCleanup;
+
+    /**
      * @param array  $aOptions
      */
-    public function __construct($name, array $aOptions){
-        $this->name     = $name;
+    public function __construct(array $aOptions){
+        $this->service  = $aOptions['serviceName'];
         $this->aOptions = $aOptions;
 
-        $this->connect($aOptions['AmiLabs\\DevKit\\Logging\\DataAccess']);
+        $this->connect($aOptions['DataAccess']);
 
         $query =
             "INSERT INTO `logging_service_link` " .
@@ -68,7 +73,7 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
 
         $query =
             "DELETE FROM `logging_service_link` " .
-            "WHERE `key` = :key";
+            "WHERE `service` = :service AND `key` = :key";
         $this->oStmtDeleteLink = $this->oDB->prepare($query);
 
         $query =
@@ -86,6 +91,20 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
                 "`value` = :value " .
                 "LIMIT 1";
         $this->oStmtLinkByValue = $this->oDB->prepare($query);
+
+        $query =
+            "INSERT INTO `logging_service_data` " .
+            "(`uid`, `date`, `service`, `key`, `type`, `data`) " .
+            "VALUES " .
+            "(:uid, :date, :service, :key, :type, :data)";
+        $this->oStmtWrite = $this->oDB->prepare($query);
+
+        $query =
+            "DELETE FROM `logging_service_data` " .
+            "WHERE " .
+                "`service` = :service AND " .
+                "`key` = :key ";
+        $this->oStmtCleanup = $this->oDB->prepare($query);
     }
 
     /**
@@ -97,9 +116,10 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      */
     public function createLink($key, $value){
         $aRecord = array(
-            'date'  => date('Y-m-d H:i:s'),
-            'key'   => $key,
-            'value' => $value,
+            'date'    => date('Y-m-d H:i:s'),
+            'service' => $this->service,
+            'key'     => $key,
+            'value'   => $value,
         );
         $this->prepareRecord($aRecord);
         $this->oStmtCreateLink->execute($aRecord);
@@ -113,7 +133,8 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      */
     public function deleteLink($key){
         $aRecord = array(
-            'key' => $key,
+            'service' => $this->service,
+            'key'     => $key,
         );
         $this->prepareRecord($aRecord);
         $this->oStmtDeleteLink->execute($aRecord);
@@ -127,6 +148,7 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      */
     public function getLinkByKey($key){
         $aRecord = array(
+            'service' => $this->service,
             'key' => $key,
         );
         $this->prepareRecord($aRecord);
@@ -144,7 +166,8 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      */
     public function getLinkByValue($value){
         $aRecord = array(
-            'value' => $value,
+            'service' => $this->service,
+            'value'   => $value,
         );
         $this->prepareRecord($aRecord);
         $this->oStmtLinkByKey->execute($aRecord);
@@ -162,19 +185,41 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      * @param  int    $level
      * @return void
      */
-    public function write($key, array $aMeta, $data, $level = self::DEBUG){
-
+    public function write($key, array $aMeta, $data, $type = self::DEBUG){
+        $aRecord = array(
+            'uid'     => uniqid('', TRUE),
+            'date'    => date('Y-m-d H:i:s'),
+            'service' => $this->service,
+            'key'     => $key,
+            'type'    => $type,
+            'data'    => json_encode($aMeta + array('data' => $data))
+        );
+        $this->prepareRecord($aRecord);
+        $this->oStmtWrite->execute($aRecord);
     }
 
     /**
      * Returns data from log.
      *
      * @param  string $key
-     * @param  int    $level
+     * @param  array  $aFilter
      * @return array
      */
-    public function get($key, $level = self::ALL){
+    public function get($key, array $aFilter = array()){
+        $query =
+            "SELECT * " .
+            "FROM `logging_service_data` " .
+            "WHERE " . $this->getFilterSQL($aFilter);
+        $oStmt = $this->oDB->prepare($query);
+        $index = 0;
+        $this->bindFilterValues($oStmt, $aFilter, $index);
+        $oStmt->execute();
+        $aData = $oStmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach(array_keys($aData) as $index){
+            $aData[$index]['data'] = json_decode($aData[$index]['data'], TRUE);
+        }
 
+        return $aData;
     }
 
     /**
@@ -184,6 +229,11 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      * @return void
      */
     public function cleanup($key){
-
+        $aRecord = array(
+            'service' => $this->service,
+            'key'     => $key,
+        );
+        $this->prepareRecord($aRecord);
+        $this->oStmtCleanup->execute($aRecord);
     }
 }

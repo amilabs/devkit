@@ -12,11 +12,10 @@ interface IDataAccessLayer{
      * Logging level
      */
 
-    const NOTICE  = 0x01;
-    const WARNING = 0x02;
-    const ERROR   = 0x04;
-    const DEBUG   = 0x08;
-    const ALL     = 0x0F;
+    const DEBUG   = 'DEBUG';
+    const NOTICE  = 'NOTICE';
+    const WARNING = 'WARNING';
+    const ERROR   = 'ERROR';
 
     /**#@-*/
 
@@ -68,10 +67,10 @@ interface IDataAccessLayer{
      * Returns data from log.
      *
      * @param  string $key
-     * @param  int    $level
+     * @param  array  $aFilter
      * @return array
      */
-    public function get($key, $level = self::ALL);
+    public function get($key, array $aFilter = array());
 
     /**
      * Cleanups data from log.
