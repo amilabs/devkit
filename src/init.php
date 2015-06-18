@@ -52,7 +52,7 @@ Registry::initialize();
 Registry::addStorage('ENV');
 
 // Store configuration to registry
-Registry::addStorage('CFG')->set(Registry::ROOT, $aConfig, Registry::PERSIST);
+Registry::addStorage('CFG')->set(Registry::ROOT, $aConfig, Registry::OVERWRITE);
 
 // Remove all local variables
 unset($aConfig, $appName, $appRoot, $cfgFile);
