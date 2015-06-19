@@ -2,28 +2,31 @@
 
 namespace AmiLabs\DevKit;
 
-use AmiLabs\DevKit\Registry;
-
 /**
  * Template engine
  */
 class Template {
     /**
-     * Singleton instance
+     * Template engine
      *
-     * @var \AmiLabs\DevKit\Template
+     * @var \AmiLabs\DevKit\ITemplate
      */
-    protected static $oInstance = null;
+    protected $oEngine;
     /**
-     * Singleton implementation.
-     *
-     * @return \AmiLabs\DevKit\Template
+     * Constructor.
      */
-    public static function getInstance(){
-        if(is_null(self::$oInstance)){
-            self::$oInstance = new Template();
+    public function __construct($engine = FALSE, array $aOptions = array()){
+        if(FALSE === $engine){
+            $engine = 'PHP';
         }
-        return self::$oInstance;
+        $className =
+            (FALSE === strpos($engine, '\\')) ?
+                'AmiLabs\\DevKit\\Template\\' . $engine :
+                $engine;
+        if(!class_exists($className)){
+            throw new Exception('Invalid template engine "' . $engine . '"');
+        }
+        $this->oEngine = new $className($aOptions);
     }
     /**
      * Returns rendered template content.
@@ -33,20 +36,7 @@ class Template {
      * @return string
      */
     public function get($name, array $aScope = array()){
-        $pathApp = Registry::useStorage('CFG')->get('path/app');
-        $aScope += $this->getGlobalScope();
-        extract($aScope);
-        $fileName = $pathApp . '/templates/' . $name . '.tpl.php';
-        if(file_exists($fileName)){
-            ob_start();
-            include($fileName);
-            $sContent = ob_get_contents();
-            ob_end_clean();
-        }else{
-            // Not found
-            $sContent = 'Template "' . $name . '" not found.';
-        }
-        return $sContent;
+        return $this->oEngine->get($name, $aScope);
     }
     /**
      * Template content output.
@@ -57,20 +47,23 @@ class Template {
     public function render($name, array $aScope = array()){
         echo $this->get($name, $aScope);
     }
-    /**
-     * Returns global data scope.
-     *
-     * @return array
-     */
-    protected function getGlobalScope(){
-        return array(
-        );
-    }
+}
+
+/**
+ * Template engine driver interface
+ */
+interface ITemplateDriver {
     /**
      * Constructor.
+     *
+     * @param array $aOptions
      */
-    protected function __construct(){
-        // do nothing
-    }
-
+    public function __construct(array $aOptions);
+    /**
+     * Returns rendered template.
+     *
+     * @param string $name   Template name
+     * @param array $aScope  Scope of template variables
+     */
+    public function get($name, array $aScope);
 }

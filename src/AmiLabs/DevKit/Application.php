@@ -16,13 +16,17 @@ class Application{
      * @var \AmiLabs\DevKit\Application
      */
     protected static $oInstance = null;
-
     /**
      * @todo Separate config for every application
      * @var Application configuation
      */
     protected $oConfig;
-
+    /**
+     * Template engine
+     *
+     * @var \AmiLabs\DevKit\Template
+     */
+    protected $oTemplate = null;
     /**
      * Singleton implementation.
      *
@@ -54,7 +58,12 @@ class Application{
      * @return \AmiLabs\DevKit\Template
      */
     public function getTemplate(){
-        return Template::getInstance();
+        if(is_null($this->oTemplate)){
+            $engine = $this->oConfig->get('Template/Engine', FALSE);
+            $aOptions = $this->oConfig->get('Template/Options', array());
+            $this->oTemplate = new Template($engine, $aOptions);
+        }
+        return $this->oTemplate;
     }
     /**
      * Returns template object.
@@ -92,12 +101,12 @@ class Application{
                 /* @var $oController \AmiLabs\DevKit\Controller */
                 $oController = new $className;
                 call_user_func(array($oController, $methodName), $this, $oRequest);
-                $oTpl = $this->getTemplate();
+                $oTemplate = $this->getTemplate();
                 $oView = $oController->getView();
                 $layout = $oController->getLayoutName();
                 $tplFile = $oController->getTemplateFile($controller . '/' . $action);
-                $content = $oTpl->get($tplFile, $oView->getScope());
-                $oTpl->render($layout, array('content' => $content) + $oView->getGlobalScope());
+                $content = $oTemplate->get($tplFile, $oView->getScope());
+                $oTemplate->render($layout, array('content' => $content) + $oView->getGlobalScope());
                 return true;
             }else{
                 throw new \Exception('Cannot call "' . $className . '::' . $methodName . '"');
