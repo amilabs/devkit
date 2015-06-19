@@ -26,7 +26,7 @@ class Smarty implements ITemplateDriver {
         // Default Smarty settings
         $aDefaultOptions = array(
              'force_compile'  => FALSE,
-             'debugging'      => TRUE,
+             'debugging'      => FALSE,
              'caching'        => TRUE,
              'cache_lifetime' => 120
         );
