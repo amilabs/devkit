@@ -157,7 +157,27 @@ class Registry {
             }
         }else{
             if(!($mode & self::APPEND)){
-                $this->aData[$key] = $value;
+                if(strpos($key, '/') !== FALSE){
+                    $aKeys = explode('/', $key);
+                    $aData = &$this->aData;
+                    foreach($aKeys as $idx => $subKey){
+                        if($idx === (count($aKeys) - 1)){
+                            $aData[$subKey] = $value;
+                        }else{
+                            if(!isset($aData[$subKey])){
+                                $aData[$subKey] = array();
+                            }
+                            if(is_array($aData[$subKey])){
+                                $aData = &$aData[$subKey];
+                            }else{
+                                throw new \Exception('Can not set registry key "' . $key . '" because "' + $subKey + "' already set and not an array");
+                            }
+                        }
+                    }
+                    return $aData;
+                }else{
+                    $this->aData[$key] = $value;
+                }
             }
         }
         if($mode & self::PERSIST){
