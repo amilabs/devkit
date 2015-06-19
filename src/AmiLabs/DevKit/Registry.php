@@ -94,7 +94,22 @@ class Registry {
      * @return boolean
      */
     public function exists($key){
-        return isset($this->aData[$key]);
+        $res = FALSE;
+        if(strpos($key, '/') !== FALSE){
+            $aKeys = explode('/', $key);
+            $aData = $this->aData;
+            foreach($aKeys as $subKey){
+                if(isset($aData[$subKey])){
+                    $aData = $aData[$subKey];
+                    $res = TRUE;
+                }else{
+                    $res = FALSE;
+                }
+            }
+        }else{
+            $res = isset($this->aData[$key]);
+        }
+        return $res;
     }
 
     /**
@@ -112,7 +127,7 @@ class Registry {
                 if(isset($aData[$subKey])){
                     $aData = $aData[$subKey];
                 }elseif(is_null($default)){
-                    trigger_error(sprintf("Key '%s' not found", $key));
+                    trigger_error(sprintf("Key '%s' not found", $key), E_USER_NOTICE);
                 }else{
                     return $default;
                 }
@@ -126,7 +141,7 @@ class Registry {
         if($this->exists($key)){
             return $aData[$key];
         }elseif(is_null($default)){
-            trigger_error(sprintf("Key '%s' not found", $key));
+            trigger_error(sprintf("Key '%s' not found", $key), E_USER_NOTICE);
         }
 
         return $default;
