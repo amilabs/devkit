@@ -106,7 +106,12 @@ class Application{
                 $layout = $oController->getLayoutName();
                 $tplFile = $oController->getTemplateFile($controller . '/' . $action);
                 $content = $oTemplate->get($tplFile, $oView->getScope());
-                $oTemplate->render($layout, array('content' => $content) + $oView->getGlobalScope());
+                $aLayoutData = array(
+                    'content' => $content,
+                    'controller' => $controller,
+                    'action' => $action
+                );
+                $oTemplate->render($layout, $aLayoutData + $oView->getGlobalScope());
                 return true;
             }else{
                 throw new \Exception('Cannot call "' . $className . '::' . $methodName . '"');
