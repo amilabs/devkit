@@ -28,22 +28,24 @@ require_once $aConfig['path']['lib'] . '/autoload.php';
 // Check if local application config file is present.
 // Can be overrided by "_subconfig" GET parameter
 $_subconfig = filter_input(INPUT_GET, '_subconfig');
-$cfgFile = $_subconfig;
-if(is_null($_subconfig)){
-    $_subconfig = $appName ? $appName : '';
-    $cfgFile = $_subconfig ? $_subconfig : 'config';
-}
-$cfgFile = FS::sanitizeFilename($cfgFile);
-$cfgFile = $aConfig['path']['cfg'] . '/config.' . $cfgFile . '.php';
-if(file_exists($cfgFile)){
-    require_once $cfgFile;
-}else{
-    throw new \Exception(
-        sprintf(
-            "Missing configuration file '%s'",
-            $cfgFile
-        )
-    );
+foreach(array(
+    $appName ? $appName : 'config',
+    $_subconfig
+) as $cfgFile){
+    if(!is_null($cfgFile)){
+        $cfgFile = FS::sanitizeFilename($cfgFile);
+        $cfgFile = $aConfig['path']['cfg'] . '/config.' . $cfgFile . '.php';
+        if(file_exists($cfgFile)){
+            require_once $cfgFile;
+        }else{
+            throw new \Exception(
+                sprintf(
+                    "Missing configuration file '%s'",
+                    $cfgFile
+                )
+            );
+        }
+    }
 }
 
 Registry::initialize();
