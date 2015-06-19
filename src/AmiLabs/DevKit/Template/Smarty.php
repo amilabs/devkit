@@ -40,6 +40,7 @@ class Smarty implements ITemplateDriver {
         // Todo: use hooks on project installation
         FS::mkDir($pathCompile);
         FS::mkDir($pathCache);
+        $this->oSmarty->setTemplateDir($pathApp . '/templates');
         $this->oSmarty->setCompileDir($pathCompile);
         $this->oSmarty->setCacheDir($pathCache);
 
