@@ -27,7 +27,9 @@ require_once $aConfig['path']['lib'] . '/autoload.php';
 
 // Check if local application config file is present.
 // Can be overrided by "_subconfig" GET parameter
-$_subconfig = filter_input(INPUT_GET, '_subconfig');
+if(!isset($_subconfig)){
+    $_subconfig = filter_input(INPUT_GET, '_subconfig');
+}
 foreach(array(
     $appName ? $appName : 'config',
     $_subconfig
