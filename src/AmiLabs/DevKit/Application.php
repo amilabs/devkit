@@ -99,7 +99,8 @@ class Application{
             require_once $fileName;
             if(class_exists($className) && method_exists($className, $methodName)){
                 /* @var $oController \AmiLabs\DevKit\Controller */
-                $oController = new $className;
+                $oController = new $className($this);
+                // todo: deprecate params $oApp and $oRequest
                 call_user_func(array($oController, $methodName), $this, $oRequest);
                 $oTemplate = $this->getTemplate();
                 $oView = $oController->getView();
