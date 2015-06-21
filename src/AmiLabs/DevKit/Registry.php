@@ -65,12 +65,20 @@ class Registry {
      * @throws Exception
      */
     public static function addStorage($name){
-        if(!isset(self::$aInstances[$name])){
+        if(!self::storageExists($name)){
             self::$aInstances[$name] = new self();
         }else{
             throw new \Exception('Storage with name "' . $name . '" already added');
         }
         return self::$aInstances[$name];
+    }
+    /**
+     * Returns true if storage with specified name exists, false otherwise.
+     * @param  string $name  Storage name
+     * @return bool
+     */
+    public static function storageExists($name){
+        return isset(self::$aInstances[$name]);
     }
 
     /**
@@ -81,7 +89,7 @@ class Registry {
      * @throws Exception
      */
     public static function useStorage($name){
-        if(!isset(self::$aInstances[$name])){
+        if(!self::storageExists($name)){
             throw new \Exception('Storage with name "' . $name . '" does not exist');
         }
         return self::$aInstances[$name];
@@ -99,17 +107,14 @@ class Registry {
             $aKeys = explode('/', $key);
             $aData = $this->aData;
             foreach($aKeys as $subKey){
+                $res = FALSE;
                 if(isset($aData[$subKey])){
                     $aData = $aData[$subKey];
                     $res = TRUE;
-                }else{
-                    $res = FALSE;
                 }
             }
-        }else{
-            $res = isset($this->aData[$key]);
         }
-        return $res;
+        return $res || isset($this->aData[$key]);
     }
 
     /**
@@ -120,31 +125,31 @@ class Registry {
      * @return mixed
      */
     public function get($key = self::ROOT, $default = null){
-        $aData = $this->aData;
-        if(strpos($key, '/') !== FALSE){
+        $result = $default;
+        $found = FALSE;
+        if(self::ROOT === $key){
+            $result = $this->aData;
+            $found = TRUE;
+        }elseif(!$found && (strpos($key, '/') !== FALSE)){
+            $aData = $this->aData;
             $aKeys = explode('/', $key);
             foreach($aKeys as $subKey){
+                $found = TRUE;
                 if(isset($aData[$subKey])){
                     $aData = $aData[$subKey];
-                }elseif(is_null($default)){
-                    trigger_error(sprintf("Key '%s' not found", $key), E_USER_NOTICE);
                 }else{
-                    return $default;
+                    $found = FALSE;
+                    break;
                 }
             }
-            return $aData;
+            $result = $aData;
+        }elseif(!$found && $this->exists($key)){
+            $result = $aData[$key];
         }
-
-        if(self::ROOT === $key){
-            return $aData;
-        }
-        if($this->exists($key)){
-            return $aData[$key];
-        }elseif(is_null($default)){
+        if(!$found){
             trigger_error(sprintf("Key '%s' not found", $key), E_USER_NOTICE);
         }
-
-        return $default;
+        return $result;
     }
 
     /**
@@ -171,13 +176,17 @@ class Registry {
                 $this->aData = array_merge($this->aData, $value);
             }
         }else{
-            if(!($mode & self::APPEND)){
+            if(!$this->exists($key) || $mode === self::OVERWRITE){
                 if(strpos($key, '/') !== FALSE){
                     $aKeys = explode('/', $key);
                     $aData = &$this->aData;
                     foreach($aKeys as $idx => $subKey){
                         if($idx === (count($aKeys) - 1)){
-                            $aData[$subKey] = $value;
+                            if(is_null($value)){
+                                unset($aData[$subKey]);
+                            }else{
+                                $aData[$subKey] = $value;
+                            }
                         }else{
                             if(!isset($aData[$subKey])){
                                 $aData[$subKey] = array();
@@ -185,13 +194,16 @@ class Registry {
                             if(is_array($aData[$subKey])){
                                 $aData = &$aData[$subKey];
                             }else{
-                                throw new \Exception('Can not set registry key "' . $key . '" because "' + $subKey + "' already set and not an array");
+                                throw new \Exception('Can not use registry key "' . $key . '" because "' + $subKey + "' already set and not an array");
                             }
                         }
                     }
-                    return $aData;
                 }else{
-                    $this->aData[$key] = $value;
+                    if(is_null($value)){
+                        unset($this->aData[$key]);
+                    }else{
+                        $this->aData[$key] = $value;
+                    }
                 }
             }
         }
@@ -208,10 +220,10 @@ class Registry {
      * @return boolean
      */
     public function remove($key){
-        $result = false;
+        $result = FALSE;
         if($this->exists($key) && !$this->isPersistent()){
-            unset($this->aData[$key]);
-            $result = true;
+            $this->set($key, NULL);
+            $result = TRUE;
         }
         return $result;
     }
