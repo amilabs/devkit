@@ -9,12 +9,6 @@ use \AmiLabs\DevKit\View;
  */
 abstract class Controller {
     /**
-     * Application
-     *
-     * @var \AmiLabs\DevKit\Application
-     */
-    protected $oApplication;
-    /**
      * View object
      *
      * @var \AmiLabs\DevKit\View
@@ -40,11 +34,9 @@ abstract class Controller {
     protected $accessGranted = null;
     /**
      * Construct.
-     *
-     * @param Application $oApplication
      */
-    public function __construct(Application $oApplication){
-        $this->oApplication = $oApplication;
+    public function __construct(){
+        $this->oApplication = Application::getInstance();
         $this->oView = new View();
         if(!$this->checkAccess()){
             $this->tplFile = 'login';
@@ -56,7 +48,7 @@ abstract class Controller {
      * @return \AmiLabs\DevKit\Application
      */
     public function getApplication(){
-        return $this->oApplication;
+        return Application::getInstance();
     }
     /**
      * Returns Request object.
@@ -64,7 +56,7 @@ abstract class Controller {
      * @return \AmiLabs\DevKit\RequestDriver
      */
     public function getRequest(){
-        return $this->oApplication->getRequest();
+        return $this->getApplication()->getRequest();
     }
     /**
      * Returns view object.
@@ -80,7 +72,7 @@ abstract class Controller {
      * @return \AmiLabs\DevKit\Registry
      */
     public function getConfig(){
-        return $this->oApplication->getConfig();
+        return $this->getApplication()->getConfig();
     }
     /**
      * Returns layout name.
