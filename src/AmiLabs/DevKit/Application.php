@@ -4,6 +4,7 @@ namespace AmiLabs\DevKit;
 
 use \AmiLabs\DevKit\Request;
 use \AmiLabs\DevKit\Registry;
+use \AmiLabs\DevKit\Router;
 use \AmiLabs\DevKit\Template;
 
 /**
@@ -11,16 +12,23 @@ use \AmiLabs\DevKit\Template;
  */
 class Application{
     /**
-     * Singeton instance.
+     * Singeton instance
      *
      * @var \AmiLabs\DevKit\Application
      */
-    protected static $oInstance = null;
+    protected static $oInstance = NULL;
     /**
-     * @todo Separate config for every application
-     * @var Application configuation
+     * Application configuration
+     *
+     * @var \AmiLabs\DevKit\Registry
      */
     protected $oConfig;
+    /**
+     * Router
+     *
+     * @var \AmiLabs\DevKit\Router
+     */
+    protected $oRouter;
     /**
      * Template engine
      *
@@ -50,7 +58,7 @@ class Application{
      * @return \AmiLabs\DevKit\Database
      */
     public function getDatabase(){
-        return null; // Database::getInstance();
+        return NULL; // Database::getInstance();
     }
     /**
      * Returns template engine.
@@ -68,12 +76,10 @@ class Application{
     /**
      * Returns template object.
      *
-     * @return \AmiLabs\DevKit\RequestURI
+     * @return \AmiLabs\DevKit\Request
      */
     public function getRequest(){
-        return Request::getInstance(
-            $this->oConfig->get('request/type', 'uri')
-        );
+        return Request::getInstance();
     }
     /**
      * Returns application configuration.
@@ -90,10 +96,10 @@ class Application{
      */
     protected function runController(){
         $oRequest = $this->getRequest();
-        $controller = $oRequest->getControllerName();
-        $action = $oRequest->getActionName();
+        $controller = $this->oRouter->getController();
+        $action = $this->oRouter->getAction();
         $className = $controller . 'Controller';
-        $methodName = 'action' . ucfirst($action); // action + Name
+        $methodName = 'action' . ucfirst($action);
         $fileName = $this->oConfig->get('path/app') . '/controllers/' . $className . '.php';
         if(file_exists($fileName)){
             require_once $fileName;
@@ -101,31 +107,35 @@ class Application{
                 /* @var $oController \AmiLabs\DevKit\Controller */
                 $oController = new $className();
                 // todo: deprecate params $oApp and $oRequest
-                call_user_func(array($oController, $methodName), $this, $oRequest);
+                call_user_func(array($oController, $methodName), $this->oRouter->getActionParameters());
                 $oTemplate = $this->getTemplate();
                 $oView = $oController->getView();
                 $layout = $oController->getLayoutName();
                 $tplFile = $oController->getTemplateFile($controller . '/' . $action);
                 $content = $oTemplate->get($tplFile, $oView->getScope());
                 $aLayoutData = array(
+                    'root' => '/' . ($oRequest->getSubfolder() ? ($oRequest->getSubfolder() . '/') : ''),
                     'content' => $content,
                     'controller' => $controller,
                     'action' => $action
                 );
                 $oTemplate->render($layout, $aLayoutData + $oView->getGlobalScope());
-                return true;
+                return TRUE;
             }else{
                 throw new \Exception('Cannot call "' . $className . '::' . $methodName . '"');
             }
         }else{
             throw new \Exception('File "' . $fileName . '" not found');
         }
-        return false;
+        return FALSE;
     }
     /**
      * Constructor.
      */
     protected function __construct(){
         $this->oConfig = Registry::useStorage('CFG');
+        $hasRoutes = $this->oConfig->exists('Router/aRoutes');
+        $aRoutes = $hasRoutes ? $this->oConfig->get('Router/aRoutes') : NULL;
+        $this->oRouter = new Router($aRoutes);
     }
 }

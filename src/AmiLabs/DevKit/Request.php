@@ -2,154 +2,150 @@
 
 namespace AmiLabs\DevKit;
 
+use AmiLabs\DevKit\Registry;
+
 /**
  * Request class.
  */
 class Request {
     /**
+     * Request scopes
+     *
+     * @var array
+     */
+    protected $aScopes = array();
+    /**
+     * List of scopes sorted by priority.
+     *
+     * @var type
+     */
+    protected $aScopesPriority = array(INPUT_POST, INPUT_GET, INPUT_COOKIE);
+    /**
+     * Base URL
+     *
+     * @var string
+     */
+    protected $baseURL;
+    /**
+     * Subfolder
+     *
+     * @var string
+     */
+    protected $subfolder;
+    /**
+     * Virtual path (using mod_rewrite)
+     *
+     * @var string
+     */
+    protected $virtualPath;
+    /**
      * Singleton implementation
      *
-     * @var \AmiLabs\DevKit\RequestDriver
+     * @var \AmiLabs\DevKit\Request
      */
-    protected static $oDriver = null;
+    protected static $oInstance = null;
     /**
      * Returns singleton instance.
      *
-     * @param string $type  Request type (uri, json, cli)
      * @return \AmiLabs\DevKit\RequestDriver
      */
-    public static function getInstance($type = 'uri'){
-        if(is_null(self::$oDriver)){
-            if(strpos($type, '\\') !== FALSE){
-                $className = $type;
-            }else{
-                $className = '\\AmiLabs\\DevKit\\Request' . strtoupper($type);
+    public static function getInstance(){
+        if(is_null(self::$oInstance)){
+            $className = get_called_class();
+            // Todo: move to Application::getRequest
+            if(class_exists('Registry' && Registry::storageExists('CFG'))){
+                // Use class name from project configuration
+                $oConfig = Registry::useStorage('CFG');
+                $className = $oConfig->get('Request/className', $className);
             }
             if(class_exists($className)){
-                self::$oDriver = new $className();
+                self::$oInstance = new $className();
             }else{
                 throw new \Exception("Request driver class " . $className . " not found");
             }
         }
-        return self::$oDriver;
+        return self::$oInstance;
     }
-}
-/**
- * Request driver interface.
- */
-interface IRequestDriver {
     /**
-     * Returns scope variable.
-     */
-    public function get($name, $default = null, $scope = INPUT_GET);
-    /**
-     * Returns GET Scope.
-     */
-    public function getScopeGET();
-    /**
-     * Returns POST Scope.
-     */
-    public function getScopePOST();
-    /**
-     * Returns Call Parameters.
+     * Returns request method or "CLI" if script is running in CLI mode.
      *
-     * @param int $index  Parameter index
+     * @return string
      */
-    public function getCallParameters($index = false);
+    public function getMethod(){
+        return filter_input(INPUT_SERVER, 'REQUEST_METHOD');
+    }
     /**
-     * Returns controller name.
-     */
-    public function getControllerName();
-    /**
-     * Returns action name.
-     */
-    public function getActionName();
-}
-/**
- * Abstract request driver class.
- */
-abstract class RequestDriver {
-    /**
-     * Controller parsed from uri
+     * Returns all HTTP headers.
      *
-     * @var string
+     * @return array
      */
-    protected $controllerName = 'index';
+    public function getHeaders(){
+        return getallheaders();
+    }
     /**
-     * Action parsed from uri
+     * Returns subfolder of current project (without leading or ending "/").
      *
-     * @var string
+     * @return string
      */
-    protected $actionName = 'index';
+    public function getSubfolder(){
+        return $this->subfolder;
+    }
     /**
-     * Script call parameters parsed from uri
+     * Returns virtual path for current request (without leading or ending "/").
      *
-     * @var array
+     * @return string
      */
-    protected $aData = array();
+    public function getVirtualPath(){
+        return $this->virtualPath;
+    }
     /**
-     * Returns scope variable.
+     * Returns request variable value.
      *
-     * @param string $name    Variable name
-     * @param mixed $default  Default variable value if not set in the scope
-     * $param int $scope      Scope (INPUT_GET, INPUT_POST)
+     * @param  string  $name     Variable name
+     * @param  mixed   $default  Default variable value
+     * @param  int     $scope    Scope name (INPUT_POST, INPUT_GET, INPUT_COOKIE, INPUT_REQUEST) [optional]
      * @return mixed
+     * @throws \Exception
      */
-    public function get($name, $default = null, $scope = INPUT_GET){
-        $aData = array();
-        switch($scope){
-            case INPUT_GET:
-                $aData = $this->getScopeGET();
-                break;
-            case INPUT_POST:
-                $aData = $this->getScopePOST();
-                break;
+    public function get($name, $default = null, $scope = INPUT_REQUEST){
+        if(isset($this->aScopes[$scope])){
+            return isset($this->aScopes[$scope][$name]) ? $this->aScopes[$scope][$name] : $default;
         }
-        return (isset($aData[$name])) ? $aData[$name] : $default;
+        throw new \Exception('Invalid request scope "' . $scope . '"');
     }
     /**
-     * Returns GET scope.
+     * Returns request scope.
      *
+     * @param  int   $scope  Scope name (INPUT_POST, INPUT_GET, INPUT_COOKIE, INPUT_REQUEST) [optional]
      * @return array
+     * @throws \Exception
      */
-    public function getScopeGET(){
-        return array();
-    }
-    /**
-     * Returns POST scope.
-     *
-     * @return array
-     */
-    public function getScopePOST(){
-        return array();
-    }
-    /**
-     * Returns script call parameters scope.
-     *
-     * @param int   $index    Parameter index
-     * @param mixed $default  Default parameter value
-     * @return array
-     */
-    public function getCallParameters($index = false, $default = null){
-        if($index === false){
-            return $this->aData;
+    public function getScope($scope = INPUT_REQUEST){
+        if(isset($this->aScopes[$scope])){
+            return $this->aScopes[$scope];
         }
-        return isset($this->aData[$index]) ? $this->aData[$index] : $default;
+        throw new \Exception('Invalid request scope "' . $scope . '"');
     }
     /**
-     * Returns controller name.
-     *
-     * @return string
+     * Constructor.
      */
-    public function getControllerName(){
-        return $this->controllerName;
+    protected function __construct(){
+        $this->aScopes[INPUT_REQUEST] = array();
+        foreach($this->aScopesPriority as $scope){
+            $this->aScopes[$scope] = filter_input_array($scope);
+            if(is_array($this->aScopes[$scope])){
+                $this->aScopes[INPUT_REQUEST] += $this->aScopes[$scope];
+            }
+        }
+        $this->parseURL();
     }
     /**
-     * Returns action name.
-     *
-     * @return string
+     * Parses URL into subfolder and virtual path.
      */
-    public function getActionName(){
-        return $this->actionName;
+    protected function parseURL(){
+        $path = trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
+        $script = trim(filter_input(INPUT_SERVER, 'SCRIPT_NAME'), '/');
+        $this->subfolder = trim(substr($script, 0, strrpos($script, '/')), '/');
+        $this->virtualPath = trim(substr($path, strlen($this->subfolder)), '/');
     }
 }
