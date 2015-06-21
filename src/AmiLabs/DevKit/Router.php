@@ -95,7 +95,8 @@ class Router {
         if(!is_null($lastRoute)){
             $this->parseRoute($vPath, $lastRoute);
         }else{
-            throw new Exception('No route found for "' . $vPath . '"');
+            // todo: route for 404
+            throw new \Exception('No route found for "' . $vPath . '"');
         }
     }
     /**
@@ -134,19 +135,14 @@ class Router {
         $aPathParts = explode('/', $path);
         $aRouteParts = explode('/', $route);
         foreach($aRouteParts as $idx => $routePart){
-            if(!strlen($routePart)){
-                continue;
-            }
-            if($routePart[0] === ':'){
-                $param = substr($routePart, 1);
+            if(strlen($routePart) && ($routePart[0] === ':')){
                 if(isset($aPathParts[$idx])){
-                    $this->aParameters[$param] = $aPathParts[$idx];
-                }else{
-                    if(isset($aRoute['defaults']) && isset($aRoute['defaults'][$param])){
-                        $this->aParameters[$param] = $aRoute['defaults'][$param];
-                    }
+                    $this->aParameters[substr($routePart, 1)] = $aPathParts[$idx];
                 }
             }
+        }
+        if(isset($aRoute['default'])){
+            $this->aParameters += $aRoute['default'];
         }
         if(isset($this->aParameters['controller'])){
             $this->controller = $this->aParameters['controller'];
