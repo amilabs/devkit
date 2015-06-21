@@ -146,7 +146,7 @@ class Registry {
         }elseif(!$found && $this->exists($key)){
             $result = $aData[$key];
         }
-        if(!$found){
+        if(!$found && is_null($default)){
             trigger_error(sprintf("Key '%s' not found", $key), E_USER_NOTICE);
         }
         return $result;
