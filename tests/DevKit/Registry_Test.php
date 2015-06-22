@@ -57,7 +57,7 @@ class Registry_Test extends PHPUnit_Framework_TestCase{
             Registry::addStorage('S1');
         }catch(\Exception $exception){}
         $this->assertInstanceOf(
-            'RuntimeException',
+            'Exception',
             $exception,
             "Adding existing storage did not threw any Exception"
         );
@@ -83,7 +83,7 @@ class Registry_Test extends PHPUnit_Framework_TestCase{
             $oStorage = Registry::useStorage('S2');
         }catch(\Exception $exception){}
         $this->assertInstanceOf(
-            'RuntimeException',
+            'Exception',
             $exception,
             "Usage of not existing storage did not threw any Exception"
         );
@@ -100,7 +100,7 @@ class Registry_Test extends PHPUnit_Framework_TestCase{
         try{
             $oStorage->set(Registry::ROOT, 'A1');
         }catch(\Exception $exception){}
-        $this->assertInstanceOf('RuntimeException', $exception);
+        $this->assertInstanceOf('Exception', $exception);
         $oStorage->set(Registry::ROOT, $this->data);
         // Get full tree
         $this->assertEquals($this->data, $oStorage->get());
@@ -128,7 +128,7 @@ class Registry_Test extends PHPUnit_Framework_TestCase{
         try{
             $oStorage->set('A1/B2/C1', TRUE);
         }catch(\Exception $exception){}
-        $this->assertInstanceOf('RuntimeException', $exception);
+        $this->assertInstanceOf('Exception', $exception);
         $oStorage->set('A1/B1/C3', NULL);
         $this->assertEquals(FALSE, $oStorage->exists('A1/B1/C3'));
         $this->assertEquals('foo', $oStorage->get('A1/B1/C3', 'foo'));
@@ -159,7 +159,7 @@ class Registry_Test extends PHPUnit_Framework_TestCase{
         try{
             $oStorage->set('A2/B2', TRUE);
         }catch(\Exception $exception){}
-        $this->assertInstanceOf('RuntimeException', $exception);
+        $this->assertInstanceOf('Exception', $exception);
     }
     /**
      * @covers \AmiLabs\DevKit\Registry::initialize()
