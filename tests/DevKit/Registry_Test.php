@@ -138,7 +138,6 @@ class Registry_Test extends PHPUnit_Framework_TestCase{
      */
     public function testRemove(){
         $oStorage = Registry::useStorage('S1');
-        $res = $oStorage->remove('A1/B2');
         $this->assertEquals(FALSE, $oStorage->remove('A1/B3'));
         $this->assertEquals(TRUE, $oStorage->exists('A1/B2'));
         $this->assertEquals(TRUE, $oStorage->remove('A1/B2'));

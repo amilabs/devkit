@@ -137,12 +137,13 @@ class Registry {
                 $found = TRUE;
                 if(isset($aData[$subKey])){
                     $aData = $aData[$subKey];
+                    $result = $aData;
                 }else{
                     $found = FALSE;
+                    $result = $default;
                     break;
                 }
             }
-            $result = $aData;
         }elseif(!$found && $this->exists($key)){
             $result = $this->aData[$key];
         }
