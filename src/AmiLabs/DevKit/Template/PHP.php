@@ -18,6 +18,15 @@ class PHP implements ITemplateDriver {
         // do nothing
     }
     /**
+     * Checks if template file exists.
+     *
+     * @param string $name  Template name
+     * @return bool
+     */
+    public function exists($name){
+        return file_exists($this->getTemplateFilename($name));
+    }
+    /**
      * Returns rendered template content.
      *
      * @param string $name   Template name
@@ -25,9 +34,7 @@ class PHP implements ITemplateDriver {
      * @return string
      */
     public function get($name, array $aScope = array()){
-        $pathApp = Registry::useStorage('CFG')->get('path/app');
-        extract($aScope);
-        $fileName = $pathApp . '/templates/' . $name . '.tpl.php';
+        $fileName = $this->getTemplateFilename($name);
         if(file_exists($fileName)){
             ob_start();
             include($fileName);
@@ -38,5 +45,16 @@ class PHP implements ITemplateDriver {
             $sContent = 'Template "' . $name . '" not found.';
         }
         return $sContent;
+    }
+    /**
+     * Returns template filename.
+     *
+     * @param string $name  Template name
+     * @return string
+     */
+    protected function getTemplateFilename($name){
+        $pathApp = Registry::useStorage('CFG')->get('path/app');
+        extract($aScope);
+        return $pathApp . '/templates/' . $name . '.tpl.php';
     }
 }

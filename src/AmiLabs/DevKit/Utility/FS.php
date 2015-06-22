@@ -81,7 +81,7 @@ class FS
      * @param  int    $mode  Access mode ({@see http://php.net/manual/en/function.chmod.php})
      * @return bool
      */
-    public static function mkDir($path, $mode = 0x777)
+    public static function mkDir($path, $mode = 0777)
     {
         $res = FALSE;
         if(!is_dir($path) && !file_exists($path)){

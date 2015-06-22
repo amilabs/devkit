@@ -29,6 +29,15 @@ class Template {
         $this->oEngine = new $className($aOptions);
     }
     /**
+     * Checks if template file exists.
+     *
+     * @param string $name  Template name
+     * @return bool
+     */
+    public function exists($name){
+        return $this->oEngine->exists($name);
+    }
+    /**
      * Returns rendered template content.
      *
      * @param string $name   Template name
@@ -59,6 +68,13 @@ interface ITemplateDriver {
      * @param array $aOptions
      */
     public function __construct(array $aOptions);
+    /**
+     * Checks if template file exists.
+     *
+     * @param string $name  Template name
+     * @return bool
+     */
+    public function exists($name);
     /**
      * Returns rendered template.
      *
