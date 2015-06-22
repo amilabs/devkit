@@ -218,6 +218,7 @@ class Registry {
      *
      * @param string $key  Registry key
      * @return boolean
+     * @todo: Remove Registry::ROOT to remove storage
      */
     public function remove($key){
         $result = FALSE;
@@ -256,6 +257,9 @@ class Registry {
         return in_array(self::ROOT, $this->aPersistents) || in_array($key, $this->aPersistents);
     }
 
+    /**
+     * Clears all storages.
+     */
     public static function initialize(){
         if(count(self::$aInstances)){
             $keys = array_keys(self::$aInstances);
