@@ -146,6 +146,7 @@ class Registry {
             }
         }elseif(!$found && $this->exists($key)){
             $result = $this->aData[$key];
+            $found = TRUE;
         }
         if(!$found && is_null($default)){
             throw new \Exception(sprintf("Key '%s' not found", $key));
