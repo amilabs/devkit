@@ -145,6 +145,10 @@ class Request {
     protected function parseURL(){
         $path = trim(parse_url(filter_input(INPUT_SERVER, 'REQUEST_URI'), PHP_URL_PATH), '/');
         $script = trim(filter_input(INPUT_SERVER, 'SCRIPT_NAME'), '/');
+        if((FALSE === strpos($script, '/')) && ($path === $script)){
+            $path = '';
+            $script = '';
+        }
         $this->subfolder = trim(substr($script, 0, strrpos($script, '/')), '/');
         $this->virtualPath = trim(substr($path, strlen($this->subfolder)), '/');
     }
