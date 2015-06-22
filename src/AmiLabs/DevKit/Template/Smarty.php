@@ -49,6 +49,16 @@ class Smarty implements ITemplateDriver {
         }
     }
     /**
+     * Checks if template file exists.
+     *
+     * @param string $name  Template name
+     * @return bool
+     */
+    public function exists($name){
+        $tplName = $name . '.tpl';
+        return $this->oSmarty->templateExists($tplName);
+    }
+    /**
      * Returns rendered template content.
      *
      * @param string $name   Template name
