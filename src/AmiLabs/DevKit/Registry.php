@@ -223,7 +223,7 @@ class Registry {
      */
     public function remove($key){
         $result = FALSE;
-        if($this->exists($key) && !$this->isPersistent()){
+        if($this->exists($key) && !$this->isPersistent($key)){
             $this->set($key, NULL);
             $result = TRUE;
         }
