@@ -148,7 +148,8 @@ class Registry {
             $result = $this->aData[$key];
         }
         if(!$found && is_null($default)){
-            trigger_error(sprintf("Key '%s' not found", $key), E_USER_NOTICE);
+            throw new \Exception(sprintf("Key '%s' not found", $key));
+            // trigger_error(sprintf("Key '%s' not found", $key), E_USER_NOTICE);
         }
         return $result;
     }
