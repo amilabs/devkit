@@ -38,7 +38,8 @@ foreach(array(
         $cfgFile = FS::sanitizeFilename($cfgFile);
         $cfgFile = $aConfig['path']['cfg'] . '/config.' . $cfgFile . '.php';
         if(file_exists($cfgFile)){
-            require_once $cfgFile;
+            //require_once $cfgFile;
+            require $cfgFile;
         }else{
             throw new \Exception(
                 sprintf(
