@@ -4,7 +4,7 @@ namespace AmiLabs\DevKit\UnitTests;
 
 use Exception;
 use PHPUnit_Framework_TestCase;
-use AmiLabs\DevKit\Event;
+use AmiLabs\DevKit\Events;
 use AmiLabs\DevKit\EventArgs;
 
 error_reporting(E_ALL);
