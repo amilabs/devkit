@@ -118,7 +118,7 @@ abstract class DataAccessPDO{
                     );
                 }
             }
-            $field = $aField['field'];
+            $field = $this->sanitizeFieldName($aField['field']);
             $value = $aField['value'];
             $op = isset($aField['op']) ? $aField['op'] : '=';
             if(is_array($value)){
@@ -183,6 +183,6 @@ abstract class DataAccessPDO{
      * @return string
      */
     protected function sanitizeFieldName($field){
-        return str_replace(array('`', '"', "'"), '', $field);
+        return str_replace(array('`', '"', "'", '%'), '', $field);
     }
 }
