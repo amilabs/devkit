@@ -182,7 +182,7 @@ class SQLite extends DataAccessPDO implements IDataAccessLayer{
      * @param  string $key
      * @param  array  $aMeta
      * @param  mixed  $data
-     * @param  int    $level
+     * @param  string $type
      * @return void
      */
     public function write($key, array $aMeta, $data, $type = self::DEBUG){
