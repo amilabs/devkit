@@ -6,6 +6,7 @@ use PDO;
 use PDOStatement;
 use AmiLabs\DevKit\DataAccessPDO;
 use AmiLabs\DevKit\Logging\IDataAccessLayer;
+use AmiLabs\DevKit\Logging\DataAccessLayer;
 
 /**
  * Data Access Layer.
@@ -13,6 +14,8 @@ use AmiLabs\DevKit\Logging\IDataAccessLayer;
  * @package AmiLabs\DevKit\Logging\DataAccess
  */
 class SQLite extends DataAccessPDO implements IDataAccessLayer{
+    use DataAccessLayer;
+
     /**
      * Service name.
      *
