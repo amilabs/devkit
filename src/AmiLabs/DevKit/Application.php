@@ -103,6 +103,10 @@ class Application{
         $fileName = $this->oConfig->get('path/app') . '/controllers/' . $className . '.php';
         if(file_exists($fileName)){
             require_once $fileName;
+            if(isset($_namespace)){
+                $className = $_namespace . $className;
+                unset($_namespace);
+            }
             if(class_exists($className) && method_exists($className, $methodName)){
                 /* @var $oController \AmiLabs\DevKit\Controller */
                 $oController = new $className();
