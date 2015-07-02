@@ -20,7 +20,7 @@ class PHP implements ITemplateDriver {
     /**
      * Checks if template file exists.
      *
-     * @param string $name  Template name
+     * @param  string $name  Template name
      * @return bool
      */
     public function exists($name){
@@ -29,32 +29,41 @@ class PHP implements ITemplateDriver {
     /**
      * Returns rendered template content.
      *
-     * @param string $name   Template name
-     * @param array $aScope  Data scope
+     * @param  string $name   Template name
+     * @param  array $aScope  Data scope
      * @return string
      */
     public function get($name, array $aScope = array()){
         $fileName = $this->getTemplateFilename($name);
         if(file_exists($fileName)){
+            extract($aScope);
             ob_start();
-            include($fileName);
-            $sContent = ob_get_contents();
-            ob_end_clean();
+            include $fileName;
+            $sContent = ob_get_clean();
         }else{
             // Not found
-            $sContent = 'Template "' . $name . '" not found.';
+            $sContent = sprintf(
+                "Template '%s' not found!",
+                $fileName
+            );
         }
+
         return $sContent;
     }
     /**
      * Returns template filename.
      *
-     * @param string $name  Template name
+     * @param  string $name  Template name
      * @return string
      */
     protected function getTemplateFilename($name){
         $pathApp = Registry::useStorage('CFG')->get('path/app');
-        extract($aScope);
-        return $pathApp . '/templates/' . $name . '.tpl.php';
+        $return = sprintf(
+            "%s/templates/%s.tpl.php",
+            $pathApp,
+            $name
+        );
+
+        return $return;
     }
 }
