@@ -32,13 +32,13 @@ abstract class LayerFactory{
     public static function getLayer($layer){
         $interface = sprintf(
             "%s\\I%sLayer",
-            self::$namespace,
-            self::$class
+            static::$namespace,
+            static::$class
         );
         $class = sprintf(
             "%s\\%s\\%s",
-            self::$namespace,
-            self::$class,
+            static::$namespace,
+            static::$class,
             $layer
         );
         $oLayer = new $class;
