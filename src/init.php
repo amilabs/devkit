@@ -13,12 +13,13 @@ if(!isset($appRoot)){
 // Default project configuration.
 $aConfig = array(
     'path' => array(
-        'www' => $appRoot . '/web',                         // Document root
-        'lib' => $appRoot . '/vendor',                      // Libraries
-        'app' => rtrim($appRoot . '/app/' . $appName, '/'), // Application classes
-        'tmp' => $appRoot . '/tmp',                         // Temporary files
-        'log' => $appRoot . '/log',                         // Logs and other debug files
-        'cfg' => $appRoot . '/cfg',                         // Custom config files
+        'root' => $appRoot,
+        'www'  => $appRoot . '/web',                         // Document root
+        'lib'  => $appRoot . '/vendor',                      // Libraries
+        'app'  => rtrim($appRoot . '/app/' . $appName, '/'), // Application classes
+        'tmp'  => $appRoot . '/tmp',                         // Temporary files
+        'log'  => $appRoot . '/log',                         // Logs and other debug files
+        'cfg'  => $appRoot . '/cfg',                         // Custom config files
     )
 );
 
