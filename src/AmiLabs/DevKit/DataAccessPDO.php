@@ -41,7 +41,7 @@ abstract class DataAccessPDO{
     protected function prepareRecord(array &$aRecord){
         $aKeys = array_keys($aRecord);
         foreach($aKeys as $key){
-            $aRecord[':' . $this->sanitizeFieldName($key)] = $aRecord[$key];
+            $aRecord[':' . $key] = $aRecord[$key];
             unset($aRecord[$key]);
         }
     }
@@ -118,7 +118,7 @@ abstract class DataAccessPDO{
                     );
                 }
             }
-            $field = $this->sanitizeFieldName($aField['field']);
+            $field = $aField['field'];
             $value = $aField['value'];
             $op = isset($aField['op']) ? $aField['op'] : '=';
             if(is_array($value)){
@@ -132,7 +132,14 @@ abstract class DataAccessPDO{
                     );
                 }
             }else{
-                $query .= $glue . " `" . $field . "` " . $op . " ? ";
+                $query .=
+                    sprintf(
+                        "%s `%s` %s %s",
+                        $glue,
+                        $field,
+                        $op,
+                        '=!' != substr($value, 0, 2) ? '?' : substr($value, 2)
+                    );
             }
         }
 
@@ -170,7 +177,9 @@ abstract class DataAccessPDO{
                         $oStmt->bindValue(++$index, $val);
                     }
                 }else{
-                    $oStmt->bindValue(++$index, $value);
+                    if('=!' != substr($value, 0, 2)){
+                        $oStmt->bindValue(++$index, $value);
+                    }
                 }
             }
         }
@@ -183,6 +192,6 @@ abstract class DataAccessPDO{
      * @return string
      */
     protected function sanitizeFieldName($field){
-        return str_replace(array('`', '"', "'", '%'), '', $field);
+        return str_replace(array('`', '"', "'"), '', $field);
     }
 }
