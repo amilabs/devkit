@@ -134,7 +134,7 @@ abstract class DataAccessPDO{
             }else{
                 $query .=
                     sprintf(
-                        "%s `%s` %s %s",
+                        "%s `%s` %s %s ",
                         $glue,
                         $field,
                         $op,
