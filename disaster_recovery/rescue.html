@@ -1,0 +1,215 @@
+<html>
+<head>
+    <style type="text/css">
+    html, body {
+      background-color: #333;
+      color: white;
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+    }
+	table {width: 100%;}
+	.name {width: 10%; text-align: right}
+	.value {width: 90%; text-align: left}
+	.key {width: 100%;}
+
+    /* The console container element */
+    #console {
+      height: 400px;
+      width: 750px;
+      position:relative;
+      background-color: black;
+      border: 2px solid #CCC;
+      margin: 0 auto;
+      margin-top: 50px;
+    }
+    /* The inner console element. */
+    .jqconsole {
+        padding: 10px;
+    }
+    /* The cursor. */
+    .jqconsole-cursor {
+        background-color: gray;
+    }
+    /* The cursor color when the console looses focus. */
+    .jqconsole-blurred .jqconsole-cursor {
+        background-color: #666;
+    }
+    /* The current prompt text color */
+    .jqconsole-prompt {
+        color: #0d0;
+    }
+    /* The command history */
+    .jqconsole-old-prompt {
+        color: #0b0;
+        font-weight: normal;
+    }
+    /* The text color when in input mode. */
+    .jqconsole-input {
+        color: #dd0;
+    }
+    /* Previously entered input. */
+    .jqconsole-old-input {
+        color: #bb0;
+        font-weight: normal;
+    }
+    /* The text color of the output. */
+    .jqconsole-output {
+        color: white;
+    }
+    </style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+	<script src="./jqconsole.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var jqconsole = $('#console').jqconsole('Welcome to server recovery page. Enter the data:\n', '>>> ');
+	        /*var startPrompt = function () {
+	          // Start the prompt with history enabled.
+	          jqconsole.Prompt(true, function (input) {
+	            // Output input with the class jqconsole-output.
+	            jqconsole.Write(input + '\n', 'jqconsole-output');
+	            // Restart the prompt.
+	            startPrompt();
+	          });
+	        };*/
+	        //startPrompt();
+
+		  $("button").click(function(){
+		  	var server_id = $( "#server_id" ).val();
+		  	var api_token = $( "#api_token" ).val();
+		  	var ssh_key = $( "#ssh_key" ).val();
+
+			$.ajax( { url : "https://api.hetzner.cloud/v1/servers/"+server_id,
+				contentType : "application/json",
+				dataType : "json",
+				headers: {"Authorization": "Bearer "+api_token}
+			}).done(function(msg){
+				var server_name = msg.server.name;
+				var server_ip = msg.server.public_net.ipv4.ip;
+				jqconsole.Write("Server: " + server_name + " ip: " + server_ip + "\n", 'jqconsole-output');
+				jqconsole.Write("Preparing server to run rescue mode..." + "\n", 'jqconsole-output');
+
+				// check if emergency ssh key exists
+				$.ajax( { url : "https://api.hetzner.cloud/v1/ssh_keys",
+					contentType : "application/json",
+					dataType : "json",
+					headers: {"Authorization": "Bearer "+api_token}
+				}).done(function(msg){
+					var ssh_key_id = ""
+					msg.ssh_keys.forEach(function(item, index){
+						if (item.name == "emergency-ssh-key"){
+							ssh_key_id = item.id
+						}
+					});
+					if (ssh_key_id != "") {
+						jqconsole.Write("Removing previously created ssh-key with id " + ssh_key_id  + "\n", 'jqconsole-output');
+					}
+					$.ajax( { url : "https://api.hetzner.cloud/v1/ssh_keys/" + ssh_key_id,
+						type: ssh_key_id != "" ? "DELETE" : "GET",
+						contentType : "application/json",
+						dataType : "json",
+						headers: {
+							"Authorization": "Bearer "+api_token
+						}
+					}).done(function(msg){
+						setTimeout(function(){
+							jqconsole.Write("Adding SSH key with name 'emergency-ssh-key'\n", 'jqconsole-output');
+							$.ajax( { url : "https://api.hetzner.cloud/v1/ssh_keys",
+								type: "POST",
+								contentType : "application/json",
+								dataType : "json",
+								headers: {
+									"Authorization": "Bearer "+api_token,
+									"Content-Type": "application/json"
+								},
+								data: JSON.stringify({
+									"labels": {},
+									"name": "emergency-ssh-key",
+									"public_key": ssh_key
+								})
+							}).done(function(msg){
+								ssh_key_id = msg.ssh_key.id;
+								jqconsole.Write("Enable rescue mode for server "+server_id+" with ssh key id "+ssh_key_id + "\n", 'jqconsole-output');
+								$.ajax( { url : "https://api.hetzner.cloud/v1/servers/" + server_id + "/actions/enable_rescue",
+									type: "POST",
+									contentType : "application/json",
+									dataType : "json",
+									headers: {
+										"Authorization": "Bearer "+api_token,
+										"Content-Type": "application/json"
+									},
+									data: JSON.stringify({
+										"ssh_keys": [ssh_key_id],
+										"type": "linux64"
+									})
+								}).done(function(msg){
+									// now we're in rescue mode
+									jqconsole.Write("Server rescue mode has been enabled\n", 'jqconsole-output');
+									jqconsole.Write("Temporary root password: " + msg.root_password + "\n", 'jqconsole-output');
+									jqconsole.Write("Reboot in 5 sec...\n", 'jqconsole-output');
+									setTimeout(function(){
+										jqconsole.Write("Reboot command sent to server\n", 'jqconsole-output');
+										$.ajax( { url : "https://api.hetzner.cloud/v1/servers/" + server_id + "/actions/reboot",
+											type: "POST",
+											contentType : "application/json",
+											dataType : "json",
+											headers: {
+												"Authorization": "Bearer "+api_token,
+												"Content-Type": "application/json"
+											}
+										}).done(function(msg){
+											jqconsole.Write("Server is in rescue mode. Waiting for boot then disable it...\n", 'jqconsole-output');
+											setTimeout(function(){
+												$.ajax( { url : "https://api.hetzner.cloud/v1/servers/" + server_id + "/actions/disable_rescue",
+													type: "POST",
+													contentType : "application/json",
+													dataType : "json",
+													headers: {
+														"Authorization": "Bearer "+api_token,
+														"Content-Type": "application/json"
+													}
+												}).done(function(msg){
+													jqconsole.Write("Rescue mode has been disabled. Server will operate normally after reboot.\n", 'jqconsole-output');
+
+												});
+											}, 10000);
+										});
+									}, 5000);
+								});
+							});
+						}, 1000);
+					});
+
+				});
+			});
+
+		  });
+		});
+	</script>
+</head>
+<body>
+	<h2>Enable rescue mode for server: </h2>
+	<table>
+		<tr>
+			<td class="name">Hetzner API key: </td>
+			<td class="value"><input type="text" name="API key" id="api_token" class="key" value=""></td>
+		</tr>
+		<tr>
+			<td class="name">Server id: </td>
+			<td class="value"><input type="text" name="server id" id="server_id" value=""></td>
+		</tr>
+		<tr>
+			<td class="name">SSH public key: </td>
+			<td class="value"><textarea rows="4" name="ssh public key" id="ssh_key" class="key" value=""></textarea></td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<button style="width: 200px">Run</button>			
+			</td>
+		</tr>
+	</table>
+	<div id="console">		
+	</div>
+	
+</body>
+</html>

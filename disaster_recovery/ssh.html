@@ -1,0 +1,277 @@
+<html>
+<head>
+    <style type="text/css">
+    html, body {
+      background-color: #333;
+      color: white;
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+    }
+	table {width: 100%;}
+	.name {width: 10%; text-align: right}
+	.value {width: 90%; text-align: left}
+	.key {width: 100%;}
+
+    /* The console container element */
+    #console {
+      height: 400px;
+      width: 750px;
+      position:relative;
+      background-color: black;
+      border: 2px solid #CCC;
+      margin: 0 auto;
+      margin-top: 50px;
+    }
+    /* The inner console element. */
+    .jqconsole {
+        padding: 10px;
+    }
+    /* The cursor. */
+    .jqconsole-cursor {
+        background-color: gray;
+    }
+    /* The cursor color when the console looses focus. */
+    .jqconsole-blurred .jqconsole-cursor {
+        background-color: #666;
+    }
+    /* The current prompt text color */
+    .jqconsole-prompt {
+        color: #0d0;
+    }
+    /* The command history */
+    .jqconsole-old-prompt {
+        color: #0b0;
+        font-weight: normal;
+    }
+    /* The text color when in input mode. */
+    .jqconsole-input {
+        color: #dd0;
+    }
+    /* Previously entered input. */
+    .jqconsole-old-input {
+        color: #bb0;
+        font-weight: normal;
+    }
+    /* The text color of the output. */
+    .jqconsole-output {
+        color: white;
+    }
+    </style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+	<script src="./jqconsole.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		function wait(ms, cb) {
+			var waitDateOne = new Date();
+			while ((new Date()) - waitDateOne <= ms) {
+			//Nothing
+			}
+			if (cb) {
+				eval(cb);
+			}
+		}
+
+		$(document).ready(function(){
+
+			var server_id, 
+				server_name,
+				api_token,
+				network_id,
+				lb;
+
+			/* API conversation description */
+			var server_info = function(server_id, callback){
+				return $.ajax({ url : "https://api.hetzner.cloud/v1/servers/" + server_id,
+					contentType : "application/json",
+					dataType : "json",
+					headers: {"Authorization": "Bearer " + api_token}
+				}).done(callback);
+			}
+
+			var get_ansible_network_id = function(){
+				var network_id = null;
+				$.ajax({ url : "https://api.hetzner.cloud/v1/networks",
+					contentType : "application/json",
+					dataType : "json",
+					headers: {"Authorization": "Bearer " + api_token},
+					async: false
+				}).done(function(msg){
+					msg.networks.forEach(function(itm){
+						if(itm.name == "ansible"){
+							network_id = itm.id
+						}
+					})
+				});
+				return network_id;
+			}
+
+			var create_lb = function(network_id, callback){
+				return $.ajax( { url : "https://api.hetzner.cloud/v1/load_balancers",
+					type: "POST",
+					contentType : "application/json",
+					dataType : "json",
+					headers: {
+						"Authorization": "Bearer " + api_token,
+						"Content-Type": "application/json"
+					},
+					data: JSON.stringify({
+						"labels": {},
+						"algorithm": {"type": "round_robin"},
+						"load_balancer_type": "lb11",
+						"network_zone": "eu-central",
+						"network": network_id,
+						"name": "recovery",
+						"services":[{"destination_port":22, "listen_port":22, "protocol": "tcp"}],
+						"targets":[{"type": "server", "server": {"id": server_id}, "use_private_ip": true}]
+						})
+					}).always(callback);
+			}
+
+			var delete_lb = function(lb_id, callback){
+				return $.ajax( { url : "https://api.hetzner.cloud/v1/load_balancers/" + lb_id,
+					type: "DELETE",
+					contentType : "application/json",
+					dataType : "json",
+					headers: {
+						"Authorization": "Bearer " + api_token,
+						"Content-Type": "application/json"
+					}
+					}).done(callback);
+			}
+
+			var get_lb = function(){
+				var lb = null;
+				$.ajax({ url : "https://api.hetzner.cloud/v1/load_balancers",
+					contentType : "application/json",
+					dataType : "json",
+					headers: {"Authorization": "Bearer " + api_token},
+					async: false
+				}).done(function(msg){
+					msg.load_balancers.forEach(function(itm){
+						if(itm.name == "recovery"){
+							lb = itm
+						}
+					})
+				});
+				return lb;
+			}
+			/* API EOF */
+
+
+			var jqconsole = $('#console').jqconsole('Welcome to server recovery page.\n', '>>> ');
+	        var startPrompt = function () {
+				// Start the prompt with history enabled.
+				jqconsole.Prompt(true, function (input) {
+				jqconsole.Write(input + '\n', 'jqconsole-output');
+				startPrompt();
+				});
+	        };
+	        startPrompt();
+
+	        var disable_rescue = function() {
+			  	jqconsole.Write("Disabling LB... ", 'jqconsole-output');
+			  	lb = get_lb()
+			  	if (lb == null){
+			  		jqconsole.Write("Load balancer does not exists. Nothing to delete. " + "\n", 'jqconsole-output');
+			  	} else {
+			  		delete_lb(lb.id, function(msg){
+			  			jqconsole.Write("Load balancer removed. " + "\n", 'jqconsole-output');
+			  		})
+			  	}
+	        } //disable rescue
+
+			var enable_rescue = function(){
+			  	jqconsole.Write("Gathering server info: " + "\n", 'jqconsole-output');
+
+			  	server_info(server_id, function(msg){
+					server_name = msg.server.name;
+					jqconsole.Write("Selected server: " + server_name + "\n", 'jqconsole-output');
+					network_id = get_ansible_network_id();
+					if (network_id == null){
+						jqconsole.Write("Error: network configuration failed. Please contact OPS team.\n", 'jqconsole-output');
+					} else {
+						jqconsole.Write("Ansible instance network ID: " + network_id + "\n", 'jqconsole-output');
+						jqconsole.Write("Will create recovery LB now... \n\n", 'jqconsole-output');
+						lb = get_lb()
+						if (lb == null){
+							create_lb(
+								network_id, 
+								function(msg){
+									jqconsole.Write("LB creation request success! Waiting for ip", 'jqconsole-output');
+									do {
+										jqconsole.Write(".", 'jqconsole-output');
+										do {
+											wait(1000);
+											lb = get_lb();
+										} while(lb == null);
+										jqconsole.Write(".", 'jqconsole-output');
+
+										lb = get_lb();
+									} while (lb.public_net.ipv4.ip == null);
+									jqconsole.Write(" done!\n", 'jqconsole-output');
+									jqconsole.Write("\tIP: " + JSON.stringify(lb.public_net.ipv4.ip) + " \n", 'jqconsole-output');
+									jqconsole.Write("\n", 'jqconsole-output');
+									jqconsole.Write("Note: to disable rescue mode, click button 'Authenticate' again then 'Disable rescue mode'\n", 'jqconsole-output');
+								});							
+						} else {
+							jqconsole.Write("LB already exists: \n", 'jqconsole-output');
+							jqconsole.Write("\tIP: " + lb.public_net.ipv4.ip + " \n", 'jqconsole-output');
+							jqconsole.Write("\n", 'jqconsole-output');
+							jqconsole.Write("Note: to disable rescue mode, click button 'Authenticate' again then 'Disable rescue mode'\n", 'jqconsole-output');
+						}
+					}
+				});
+			} // enable rescue
+			$("#auth").click(function(){
+			  	server_id = $("#server_id").val();
+			  	api_token = $("#api_token").val();
+			  	server_info(server_id, function(){
+			  		jqconsole.Write("Authentication success.\n", 'jqconsole-output');
+				  	lb = get_lb()
+					if (lb == null){
+						$("#selector").unbind('click').html("Enable rescue mode").fadeIn().click(function(){
+							enable_rescue()
+						});
+					} else {
+						jqconsole.Write("LB already exists: \n", 'jqconsole-output');
+						jqconsole.Write("\tIP: " + lb.public_net.ipv4.ip + " \n", 'jqconsole-output');
+						$("#selector").unbind('click').html("Disable rescue mode").fadeIn().click(function(){
+							disable_rescue()
+						});
+					}
+			  	}).fail(function(){
+			  		jqconsole.Write("Authentication failed. Check token and server id.\n", 'jqconsole-output');
+			  	});
+			})
+
+		});
+	</script>
+</head>
+<body>
+	<h2>Get SSH access to server: </h2>
+	<table>
+		<tr>
+			<td class="name">Hetzner API key: </td>
+			<td class="value"><input type="text" name="API key" id="api_token" class="key" value=""></td>
+		</tr>
+		<tr>
+			<td class="name">Server id: </td>
+			<td class="value"><input type="text" name="server id" id="server_id" value=""></td>
+
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<button id="auth" style="width: 200px;">Authenticate</button>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<button id="selector" style="width: 200px;display: none;"></button>
+			</td>
+		</tr>
+	</table>
+	<div id="console">		
+	</div>
+	
+</body>
+</html>
